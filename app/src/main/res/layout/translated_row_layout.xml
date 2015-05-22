@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/remove"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"
+        android:textSize="20sp"
+        android:background="@drawable/ic_rm"
+        android:adjustViewBounds="false"/>
+
+    <EditText
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/language"
+        android:textSize="18sp"
+        android:text="foobar"
+        android:capitalize="characters"
+        android:textStyle="bold"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:inputType="text" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/text"
+        android:textSize="18sp"
+        android:text="foobar"/>
+
+</LinearLayout>
