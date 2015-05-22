@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Comparator;
+
 /**
  * Created by mikael.korpela on 12.5.2015.
  */
@@ -39,6 +41,27 @@ public class Item implements Parcelable, Jasonable {
     private String type;
     private Translated name = new Translated();
     private String location;
+
+    public static final Comparator<Item> orderByName = new Comparator<Item>() {
+        @Override
+        public int compare(Item lhs, Item rhs) {
+            return lhs.getName().compareTo(rhs.getName());
+        }
+    };
+
+    public static final Comparator<Item> orderByID = new Comparator<Item>() {
+        @Override
+        public int compare(Item lhs, Item rhs) {
+            return lhs.getID().compareTo(rhs.getID());
+        }
+    };
+
+    public static final Comparator<Item> orderByType = new Comparator<Item>() {
+        @Override
+        public int compare(Item lhs, Item rhs) {
+            return lhs.getType().compareTo(rhs.getType());
+        }
+    };
 
     public Item(JSONObject json) throws JSONException
     {
