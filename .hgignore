@@ -2,3 +2,4 @@ syntax: glob
 .gradle/
 .idea/
 build/
+local.properties
