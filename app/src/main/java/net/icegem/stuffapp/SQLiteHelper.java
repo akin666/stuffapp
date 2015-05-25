@@ -22,6 +22,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     {
         database.execSQL(Item.DATABASE_CREATE);
         database.execSQL(Translated.DATABASE_CREATE);
+
+        Text.onCreate(database);
     }
 
     @Override
@@ -30,6 +32,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         Log.w(SQLiteHelper.class.getName(), "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
         db.execSQL("DROP TABLE IF EXISTS " + Item.TABLE + ";");
         db.execSQL("DROP TABLE IF EXISTS " + Translated.TABLE + ";");
+
+        Text.onUpgrade(db,oldVersion,newVersion);
         onCreate(db);
     }
 }
