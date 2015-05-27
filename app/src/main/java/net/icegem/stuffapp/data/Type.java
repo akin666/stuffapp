@@ -17,29 +17,11 @@ public class Type implements Parcelable, Jasonable {
     public static final String EDIT_ACTION = "Type_Edit_Action";
     public static final String VIEW_ACTION = "Type_View_Action";
 
-    // DB Strings
-    public static final String TABLE = "Type";
-
+    // universal column strings
     public static final String COLUMN_IDENTIFIER = "_id";
     public static final String COLUMN_NAME = "name";
 
-    public static final String[] translationColumns = {
-            COLUMN_IDENTIFIER,
-            COLUMN_NAME
-    };
-
-    public static final String DATABASE_CREATE =
-            "CREATE TABLE IF NOT EXISTS " + TABLE + "(" +
-                    COLUMN_IDENTIFIER + " integer primary key autoincrement, " +
-                    COLUMN_NAME + " integer " +
-                    ");";
-
     // Members
-
-    public void setName(Text name) {
-        this.name = name;
-    }
-
     private static int nid = 10;
 
     private int _id;
@@ -63,6 +45,10 @@ public class Type implements Parcelable, Jasonable {
 
     public void setId( int id ) {
         _id = id;
+    }
+
+    public void setName(Text name) {
+        this.name = name;
     }
 
     public Text getName() {
@@ -128,14 +114,5 @@ public class Type implements Parcelable, Jasonable {
     public void parse(JSONObject json) throws JSONException {
         _id = json.getInt(COLUMN_IDENTIFIER);
         name = new Text(json.getJSONObject(COLUMN_NAME));
-    }
-
-    /// DB Management
-    public static void onCreate(SQLiteDatabase database) {
-        database.execSQL(DATABASE_CREATE);
-    }
-
-    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE + ";");
     }
 }

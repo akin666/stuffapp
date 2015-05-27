@@ -26,39 +26,12 @@ public class Text implements Parcelable, Jasonable {
     public static final String EDIT_ACTION = "Text_Edit_Action";
     public static final String VIEW_ACTION = "Text_View_Action";
 
-    // DB Strings
-    public static final String TABLE = "Text";
-    public static final String TABLE_TRANSLATE = "TextTranslate";
-
+    // universal column strings
     public static final String COLUMN_IDENTIFIER = "_id";
     public static final String COLUMN_COMMENT = "comment";
     public static final String COLUMN_LANGUAGE = "language";
     public static final String COLUMN_VALUE = "value";
     public static final String COLUMN_TEXT = "text";
-
-    public static final String[] translationColumns = {
-            COLUMN_TEXT,
-            COLUMN_LANGUAGE,
-            COLUMN_VALUE
-    };
-
-    public static final String[] columns = {
-            COLUMN_IDENTIFIER,
-            COLUMN_COMMENT
-    };
-
-    public static final String DATABASE_CREATE_TRANSLATE =
-        "CREATE TABLE IF NOT EXISTS " + TABLE_TRANSLATE + "(" +
-                COLUMN_TEXT + " integer, " +
-                COLUMN_LANGUAGE + " text not null," +
-                COLUMN_VALUE + " text," +
-                "PRIMARY KEY (" + COLUMN_IDENTIFIER + "," + COLUMN_LANGUAGE + "));";
-
-    public static final String DATABASE_CREATE =
-            "CREATE TABLE IF NOT EXISTS " + TABLE + "(" +
-                    COLUMN_IDENTIFIER + " integer primary key autoincrement, " +
-                    COLUMN_COMMENT + " text" +
-                    ");";
 
     // Members
     private static int nid = 10;
@@ -293,16 +266,5 @@ public class Text implements Parcelable, Jasonable {
             values.add(item);
         }
         sort();
-    }
-
-    /// DB Management
-    public static void onCreate(SQLiteDatabase database) {
-        database.execSQL(DATABASE_CREATE);
-        database.execSQL(DATABASE_CREATE_TRANSLATE);
-    }
-
-    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE + ";");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANSLATE + ";");
     }
 }
