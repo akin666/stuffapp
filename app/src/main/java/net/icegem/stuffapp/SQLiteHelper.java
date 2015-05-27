@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import net.icegem.stuffapp.data.Text;
+
 /**
  * Created by mikael.korpela on 19.5.2015.
  */
