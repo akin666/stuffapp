@@ -1,9 +1,13 @@
-package net.icegem.stuffapp;
+package net.icegem.stuffapp.data;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import net.icegem.stuffapp.Jasonable;
+import net.icegem.stuffapp.MutablePair;
+import net.icegem.stuffapp.Settings;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,43 +29,61 @@ public class Text implements Parcelable, Jasonable {
     // DB Strings
     public static final String TABLE = "Text";
 
-    public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_IDENTIFIER = "id";
+    public static final String COLUMN_IDENTIFIER = "_id";
+    public static final String COLUMN_COMMENT = "comment";
     public static final String COLUMN_LANGUAGE = "language";
     public static final String COLUMN_VALUE = "value";
 
     public static final String[] translationColumns = {
-            COLUMN_ID,
+            COLUMN_IDENTIFIER,
             COLUMN_LANGUAGE,
             COLUMN_VALUE
     };
 
     public static final String DATABASE_CREATE =
         "CREATE TABLE IF NOT EXISTS " + TABLE + "(" +
-                COLUMN_ID + " text not null, " +
+                COLUMN_IDENTIFIER + " text not null, " +
                 COLUMN_LANGUAGE + " text not null," +
                 COLUMN_VALUE + " text," +
-                "PRIMARY KEY (" + COLUMN_ID + "," + COLUMN_LANGUAGE + "));";
+                "PRIMARY KEY (" + COLUMN_IDENTIFIER + "," + COLUMN_LANGUAGE + "));";
 
     // Members
-    private String id;
+    private static int nid = 10;
+
+    private int _id;
+    private String comment;
     private Vector<MutablePair<String, String>> values = new Vector<MutablePair<String, String>>();
 
     public Text() {
+        _id = -(++nid);
     }
 
-    public Text( String id ) {
+    public Text(JSONObject json) throws JSONException {
+        parse(json);
+    }
+
+    public Text( int id ) {
         setId(id);
     }
 
-    String getId()
+    public int getId()
     {
-        return id;
+        return _id;
     }
 
-    void setId(String value)
+    public void setId(int value)
     {
-        this.id = value;
+        this._id = value;
+    }
+
+    public String getComment()
+    {
+        return comment;
+    }
+
+    public void setComment(String value)
+    {
+        this.comment = value;
     }
 
     public String get() {
@@ -79,7 +101,8 @@ public class Text implements Parcelable, Jasonable {
 
         if( lang == Settings.language ) {
             // lets be nice..
-            return getId();
+            // We could throw, and that would be preferrable in debug situations.
+            return "" + _id;
         }
         return get(null);
     }
@@ -151,13 +174,18 @@ public class Text implements Parcelable, Jasonable {
         values.remove(index);
     }
 
+
+    public int size() {
+        return values.size();
+    }
+
     @Override
     public String toString() {
         return get();
     }
 
-    public int size() {
-        return values.size();
+    public int compareTo(Text other) {
+        return get().compareTo(other.get());
     }
 
     //// Parcelable
@@ -171,11 +199,12 @@ public class Text implements Parcelable, Jasonable {
         clean();
 
         Bundle bundle = new Bundle();
-        bundle.putString(COLUMN_IDENTIFIER , getId() );
         for( MutablePair<String,String> pair : values ) {
             bundle.putString( pair.first , pair.second );
         }
 
+        out.writeInt(getId());
+        out.writeString( getComment() );
         out.writeBundle(bundle);
     }
 
@@ -190,14 +219,13 @@ public class Text implements Parcelable, Jasonable {
     };
 
     private Text(Parcel in) {
+        setId( in.readInt() );
+        setComment( in.readString() );
+
         Bundle bundle = in.readBundle();
         for( String key : bundle.keySet() ) {
             String value = bundle.getString(key);
             if(value != null) {
-                if( key.equals(COLUMN_IDENTIFIER)) {
-                    setId(value);
-                    continue;
-                }
                 MutablePair<String,String> item = new MutablePair<String,String>(key,value);
                 values.add(item);
             }
@@ -224,6 +252,7 @@ public class Text implements Parcelable, Jasonable {
         JSONObject json = new JSONObject();
         try {
             json.put(COLUMN_IDENTIFIER,getId());
+            json.put(COLUMN_COMMENT,getComment());
             for( MutablePair<String,String> pair : values ) {
                 json.put( pair.first , pair.second );
             }
@@ -241,13 +270,15 @@ public class Text implements Parcelable, Jasonable {
 
         while( keys.hasNext() ) {
             String key = keys.next();
-            String value = json.getString(key);
-            if( key.equals(COLUMN_IDENTIFIER))
-            {
-                setId(value);
+            if( key.equals(COLUMN_IDENTIFIER)) {
+                setId(json.getInt(COLUMN_IDENTIFIER));
                 continue;
             }
-            MutablePair<String,String> item = new MutablePair<String,String>(key,value);
+            if( key.equals(COLUMN_COMMENT)) {
+                setComment(json.getString(COLUMN_COMMENT));
+                continue;
+            }
+            MutablePair<String,String> item = new MutablePair<String,String>(key,json.getString(key));
             values.add(item);
         }
         sort();
