@@ -28,7 +28,6 @@ public class Text implements Parcelable, Jasonable {
 
     // universal column strings
     public static final String COLUMN_IDENTIFIER = "_id";
-    public static final String COLUMN_COMMENT = "comment";
     public static final String COLUMN_LANGUAGE = "language";
     public static final String COLUMN_VALUE = "value";
     public static final String COLUMN_TEXT = "text";
@@ -37,7 +36,6 @@ public class Text implements Parcelable, Jasonable {
     private static int nid = 10;
 
     private int _id;
-    private String comment;
     private Vector<MutablePair<String, String>> values = new Vector<MutablePair<String, String>>();
 
     public Text() {
@@ -58,16 +56,6 @@ public class Text implements Parcelable, Jasonable {
 
     public void setId( int id ) {
         _id = id;
-    }
-
-    public String getComment()
-    {
-        return comment;
-    }
-
-    public void setComment(String value)
-    {
-        this.comment = value;
     }
 
     public String get() {
@@ -188,7 +176,6 @@ public class Text implements Parcelable, Jasonable {
         }
 
         out.writeInt(getId());
-        out.writeString( getComment() );
         out.writeBundle(bundle);
     }
 
@@ -203,9 +190,8 @@ public class Text implements Parcelable, Jasonable {
     };
 
     private Text(Parcel in) {
-        setId( in.readInt() );
-        setComment( in.readString() );
 
+        setId( in.readInt() );
         Bundle bundle = in.readBundle();
         for( String key : bundle.keySet() ) {
             String value = bundle.getString(key);
@@ -236,7 +222,6 @@ public class Text implements Parcelable, Jasonable {
         JSONObject json = new JSONObject();
         try {
             json.put(COLUMN_IDENTIFIER,getId());
-            json.put(COLUMN_COMMENT,getComment());
             for( MutablePair<String,String> pair : values ) {
                 json.put( pair.first , pair.second );
             }
@@ -256,10 +241,6 @@ public class Text implements Parcelable, Jasonable {
             String key = keys.next();
             if( key.equals(COLUMN_IDENTIFIER)) {
                 setId(json.getInt(COLUMN_IDENTIFIER));
-                continue;
-            }
-            if( key.equals(COLUMN_COMMENT)) {
-                setComment(json.getString(COLUMN_COMMENT));
                 continue;
             }
             MutablePair<String,String> item = new MutablePair<String,String>(key,json.getString(key));
