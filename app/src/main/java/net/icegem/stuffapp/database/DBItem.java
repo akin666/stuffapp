@@ -1,5 +1,6 @@
 package net.icegem.stuffapp.database;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import net.icegem.stuffapp.data.Item;
@@ -34,6 +35,34 @@ public class DBItem {
                     Item.COLUMN_PICTURE + " text, " +
                     Item.COLUMN_LOCATION + " text " +
                     ");";
+
+    public static Item get(SQLiteDatabase db , int id)
+    {
+        Item item = new Item(id);
+
+        Cursor cursor = db.query(TABLE, columns, Item.COLUMN_IDENTIFIER + " = " + id, null, null, null, null);
+
+        cursor.moveToFirst();
+        if (!cursor.isAfterLast())
+        {
+            // int id = cursor.getInt(0);
+            int collection = cursor.getInt(1);
+            int description = cursor.getInt(2);
+            int type = cursor.getInt(3);
+
+            item.setCode( cursor.getString(4) );
+            item.setLink(cursor.getString(5));
+            item.setVolume(cursor.getString(6));
+            item.setPicture(cursor.getString(7));
+            item.setLocation(cursor.getString(8));
+            cursor.close();
+
+            item.setCollection(DBCollection.get(db, collection));
+            item.setDescription(DBText.get(db, description));
+            item.setType(DBType.get(db, type));
+        }
+        return item;
+    }
 
     /// DB Management
     public static void onCreate(SQLiteDatabase database) {

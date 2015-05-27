@@ -1,5 +1,6 @@
 package net.icegem.stuffapp.database;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import net.icegem.stuffapp.data.Collection;
@@ -11,7 +12,7 @@ public class DBCollection {
     // DB Strings
     public static final String TABLE = "Collection";
 
-    public static final String[] translationColumns = {
+    public static final String[] columns = {
             Collection.COLUMN_IDENTIFIER,
             Collection.COLUMN_NAME,
             Collection.COLUMN_DESCRIPTION,
@@ -27,6 +28,29 @@ public class DBCollection {
                     Collection.COLUMN_PICTURE + " text," +
                     Collection.COLUMN_LINK + " text" +
                     ");";
+
+    public static Collection get(SQLiteDatabase db , int id)
+    {
+        Collection collection = new Collection(id);
+
+        Cursor cursor = db.query(TABLE, columns, Collection.COLUMN_IDENTIFIER + " = " + id, null, null, null, null);
+
+        cursor.moveToFirst();
+        if (!cursor.isAfterLast())
+        {
+            // int id = cursor.getInt(0);
+            int nameText = cursor.getInt(1);
+            int descriptionText = cursor.getInt(2);
+
+            collection.setPicture( cursor.getString(3) );
+            collection.setPicture( cursor.getString(4) );
+            cursor.close();
+
+            collection.setName(DBText.get(db, nameText));
+            collection.setDescription(DBText.get(db, descriptionText));
+        }
+        return collection;
+    }
 
     /// DB Management
     public static void onCreate(SQLiteDatabase database) {

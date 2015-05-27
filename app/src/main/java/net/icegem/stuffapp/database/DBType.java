@@ -1,5 +1,6 @@
 package net.icegem.stuffapp.database;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import net.icegem.stuffapp.data.Type;
@@ -11,7 +12,7 @@ public class DBType {
     // DB Strings
     public static final String TABLE = "Type";
 
-    public static final String[] translationColumns = {
+    public static final String[] columns = {
             Type.COLUMN_IDENTIFIER,
             Type.COLUMN_NAME
     };
@@ -21,6 +22,24 @@ public class DBType {
                     Type.COLUMN_IDENTIFIER + " integer primary key autoincrement, " +
                     Type.COLUMN_NAME + " integer " +
                     ");";
+
+    public static Type get(SQLiteDatabase db , int id)
+    {
+        Type type = new Type(id);
+
+        Cursor cursor = db.query(TABLE, columns, Type.COLUMN_IDENTIFIER + " = " + id, null, null, null, null);
+
+        cursor.moveToFirst();
+        if (!cursor.isAfterLast())
+        {
+            // int id = cursor.getInt(0);
+            int textId = cursor.getInt(1);
+            cursor.close();
+
+            type.setName( DBText.get(db , textId) );
+        }
+        return type;
+    }
 
     /// DB Management
     public static void onCreate(SQLiteDatabase database) {
