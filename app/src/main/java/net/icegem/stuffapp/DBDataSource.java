@@ -4,7 +4,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import net.icegem.stuffapp.data.Collection;
+import net.icegem.stuffapp.data.Item;
+import net.icegem.stuffapp.data.Text;
+import net.icegem.stuffapp.data.Type;
 import net.icegem.stuffapp.ui.Common;
 
 import java.util.ArrayList;
@@ -14,13 +20,38 @@ import java.util.List;
  * Created by mikael.korpela on 19.5.2015.
  */
 public class DBDataSource {
-    private SQLiteHelper helper;
+    private SQLiteOpenHelper helper;
     private Context context;
+
+    private static final String DATABASE_NAME = "items.db";
+    private static final int DATABASE_VERSION = 3;
 
     public DBDataSource(Context context)
     {
         this.context = context;
-        helper = new SQLiteHelper(context);
+
+        helper = new SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+            @Override
+            public void onCreate(SQLiteDatabase database) {
+                Text.onCreate(database);
+                Collection.onCreate(database);
+                Type.onCreate(database);
+                Item.onCreate(database);
+            }
+
+            @Override
+            public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
+
+                Log.w(SQLiteHelper.class.getName(), "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
+
+                Text.onUpgrade(database, oldVersion, newVersion);
+                Collection.onUpgrade(database, oldVersion, newVersion);
+                Type.onUpgrade(database, oldVersion, newVersion);
+                Item.onUpgrade(database, oldVersion, newVersion);
+
+                onCreate(database);
+            }
+        };
     }
 
     private Item toItem(Cursor cursor) {

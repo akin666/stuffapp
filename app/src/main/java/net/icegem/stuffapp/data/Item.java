@@ -1,5 +1,6 @@
 package net.icegem.stuffapp.data;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -21,7 +22,9 @@ public class Item implements Parcelable, Jasonable {
     public static final String COLUMN_DESCRIPTION = "description";
     public static final String COLUMN_TYPE = "type";
     public static final String COLUMN_CODE = "code";
+    public static final String COLUMN_LINK = "link";
     public static final String COLUMN_VOLUME = "volume";
+    public static final String COLUMN_PICTURE = "picture";
     public static final String COLUMN_LOCATION = "location";
 
     public static final String[] columns = {
@@ -30,7 +33,9 @@ public class Item implements Parcelable, Jasonable {
             COLUMN_DESCRIPTION,
             COLUMN_TYPE,
             COLUMN_CODE,
+            COLUMN_LINK,
             COLUMN_VOLUME,
+            COLUMN_PICTURE,
             COLUMN_LOCATION
     };
 
@@ -41,7 +46,9 @@ public class Item implements Parcelable, Jasonable {
                     COLUMN_DESCRIPTION + " integer, " +
                     COLUMN_TYPE + " integer, " +
                     COLUMN_CODE + " text, " +
+                    COLUMN_LINK + " text, " +
                     COLUMN_VOLUME + " text, " +
+                    COLUMN_PICTURE + " text, " +
                     COLUMN_LOCATION + " text " +
                     ");";
 
@@ -75,7 +82,9 @@ public class Item implements Parcelable, Jasonable {
     private Text description;
     private Type type;
     private String code;
+    private String link;
     private String volume;
+    private String picture;
     private String location;
 
     public Item() {
@@ -90,12 +99,44 @@ public class Item implements Parcelable, Jasonable {
         _id = id;
     }
 
-    public int getID() {
+    public int getId() {
         return _id;
     }
 
-    public void setId(int id) {
-        this._id = id;
+    public void setId( int id ) {
+        _id = id;
+    }
+
+    public Text getDescription() {
+        return description;
+    }
+
+    public void setDescription(Text description) {
+        this.description = description;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public Collection getCollection() {
@@ -218,12 +259,21 @@ public class Item implements Parcelable, Jasonable {
 
     @Override
     public void parse(JSONObject json) throws JSONException {
-        _id = json.getInt( COLUMN_IDENTIFIER );
+        _id = json.getInt(COLUMN_IDENTIFIER);
         collection = new Collection(json.getInt(COLUMN_COLLECTION));
         description = new Text(json.getJSONObject(COLUMN_DESCRIPTION));
         type = new Type(json.getInt(COLUMN_TYPE));
         code = json.getString(COLUMN_CODE);
         volume = json.getString(COLUMN_VOLUME);
         location = json.getString(COLUMN_LOCATION);
+    }
+
+    /// DB Management
+    public static void onCreate(SQLiteDatabase database) {
+        database.execSQL(DATABASE_CREATE);
+    }
+
+    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE + ";");
     }
 }

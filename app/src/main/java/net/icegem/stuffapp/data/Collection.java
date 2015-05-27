@@ -1,5 +1,6 @@
 package net.icegem.stuffapp.data;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -80,6 +81,10 @@ public class Collection implements Parcelable, Jasonable {
         return _id;
     }
 
+    public void setId( int id ) {
+        _id = id;
+    }
+
     public Text getName()
     {
         return name;
@@ -95,6 +100,14 @@ public class Collection implements Parcelable, Jasonable {
 
     public void setPicture(String value) {
         picture = value;
+    }
+
+    public void setDescription(Text description) {
+        this.description = description;
+    }
+
+    public void setName(Text name) {
+        this.name = name;
     }
 
     public String getLink() {
@@ -176,5 +189,14 @@ public class Collection implements Parcelable, Jasonable {
         description = new Text(json.getJSONObject(COLUMN_DESCRIPTION));
         picture = json.getString(COLUMN_PICTURE);
         link = json.getString(COLUMN_LINK);
+    }
+
+    /// DB Management
+    public static void onCreate(SQLiteDatabase database) {
+        database.execSQL(DATABASE_CREATE);
+    }
+
+    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE + ";");
     }
 }
