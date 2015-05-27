@@ -1,7 +1,7 @@
 package net.icegem.stuffapp.database;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
 import net.icegem.stuffapp.data.Text;
 
 /**
@@ -18,8 +18,7 @@ public class DBText {
     };
 
     public static final String[] columns = {
-            Text.COLUMN_IDENTIFIER,
-            Text.COLUMN_COMMENT
+            Text.COLUMN_IDENTIFIER
     };
 
     public static final String DATABASE_CREATE_TRANSLATE =
@@ -31,9 +30,26 @@ public class DBText {
 
     public static final String DATABASE_CREATE =
             "CREATE TABLE IF NOT EXISTS " + TABLE + "(" +
-                    Text.COLUMN_IDENTIFIER + " integer primary key autoincrement, " +
-                    Text.COLUMN_COMMENT + " text" +
+                    Text.COLUMN_IDENTIFIER + " integer primary key autoincrement " +
                     ");";
+
+    public static Text get(SQLiteDatabase db , int id)
+    {
+        Text text = new Text(id);
+
+        Cursor cursor = db.query(TABLE_TRANSLATE, translationColumns, Text.COLUMN_TEXT + " = " + id, null, null, null, null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast())
+        {
+            // int text = cursor.getInt(0);
+            String language = cursor.getString(1);
+            String value = cursor.getString(2);
+
+            text.set(language,value);
+        }
+        return text;
+    }
 
     /// DB Management
     public static void onCreate(SQLiteDatabase database) {
