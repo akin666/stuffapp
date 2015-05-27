@@ -16,7 +16,6 @@ import java.util.Comparator;
  * Created by mikael.korpela on 12.5.2015.
  */
 public class Item implements Parcelable, Jasonable {
-    public static final String TABLE = "Item";
     public static final String COLUMN_IDENTIFIER = "_id";
     public static final String COLUMN_COLLECTION = "collection";
     public static final String COLUMN_DESCRIPTION = "description";
@@ -26,31 +25,6 @@ public class Item implements Parcelable, Jasonable {
     public static final String COLUMN_VOLUME = "volume";
     public static final String COLUMN_PICTURE = "picture";
     public static final String COLUMN_LOCATION = "location";
-
-    public static final String[] columns = {
-            COLUMN_IDENTIFIER,
-            COLUMN_COLLECTION,
-            COLUMN_DESCRIPTION,
-            COLUMN_TYPE,
-            COLUMN_CODE,
-            COLUMN_LINK,
-            COLUMN_VOLUME,
-            COLUMN_PICTURE,
-            COLUMN_LOCATION
-    };
-
-    public static final String DATABASE_CREATE =
-            "CREATE TABLE IF NOT EXISTS " + TABLE + "(" +
-                    COLUMN_IDENTIFIER + " integer primary key autoincrement, " +
-                    COLUMN_COLLECTION + " integer, " +
-                    COLUMN_DESCRIPTION + " integer, " +
-                    COLUMN_TYPE + " integer, " +
-                    COLUMN_CODE + " text, " +
-                    COLUMN_LINK + " text, " +
-                    COLUMN_VOLUME + " text, " +
-                    COLUMN_PICTURE + " text, " +
-                    COLUMN_LOCATION + " text " +
-                    ");";
 
     // OrderBy
     public static final Comparator<Item> orderByVolume = new Comparator<Item>() {
@@ -215,7 +189,9 @@ public class Item implements Parcelable, Jasonable {
         out.writeParcelable(description, flags);
         out.writeParcelable(type, flags);
         out.writeString(code);
+        out.writeString(link);
         out.writeString(volume);
+        out.writeString(picture);
         out.writeString(location);
     }
 
@@ -235,7 +211,9 @@ public class Item implements Parcelable, Jasonable {
         description = in.readParcelable(Text.class.getClassLoader());
         type = in.readParcelable(Type.class.getClassLoader());
         code = in.readString();
+        link = in.readString();
         volume = in.readString();
+        picture = in.readString();
         location = in.readString();
     }
 
@@ -249,7 +227,9 @@ public class Item implements Parcelable, Jasonable {
             json.put( COLUMN_DESCRIPTION , description.toJSON());
             json.put( COLUMN_TYPE , type.getId() );
             json.put( COLUMN_CODE , code );
+            json.put( COLUMN_LINK , link );
             json.put( COLUMN_VOLUME , volume );
+            json.put( COLUMN_PICTURE , picture );
             json.put( COLUMN_LOCATION , location );
         } catch (JSONException e) {
             return null;
@@ -264,16 +244,9 @@ public class Item implements Parcelable, Jasonable {
         description = new Text(json.getJSONObject(COLUMN_DESCRIPTION));
         type = new Type(json.getInt(COLUMN_TYPE));
         code = json.getString(COLUMN_CODE);
+        link = json.getString(COLUMN_LINK);
         volume = json.getString(COLUMN_VOLUME);
+        picture = json.getString(COLUMN_PICTURE);
         location = json.getString(COLUMN_LOCATION);
-    }
-
-    /// DB Management
-    public static void onCreate(SQLiteDatabase database) {
-        database.execSQL(DATABASE_CREATE);
-    }
-
-    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE + ";");
     }
 }

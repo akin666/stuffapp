@@ -23,30 +23,11 @@ public class Collection implements Parcelable, Jasonable {
     public static final String VIEW_ACTION = "Collection_View_Action";
 
     // DB Strings
-    public static final String TABLE = "Collection";
-
     public static final String COLUMN_IDENTIFIER = "_id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_PICTURE = "picture";
     public static final String COLUMN_DESCRIPTION = "description";
     public static final String COLUMN_LINK = "link";
-
-    public static final String[] translationColumns = {
-            COLUMN_IDENTIFIER,
-            COLUMN_NAME,
-            COLUMN_DESCRIPTION,
-            COLUMN_PICTURE,
-            COLUMN_LINK
-    };
-
-    public static final String DATABASE_CREATE =
-            "CREATE TABLE IF NOT EXISTS " + TABLE + "(" +
-                    COLUMN_IDENTIFIER + " integer primary key autoincrement, " +
-                    COLUMN_NAME + " integer," +
-                    COLUMN_DESCRIPTION + " integer," +
-                    COLUMN_PICTURE + " text," +
-                    COLUMN_LINK + " text" +
-                    ");";
 
     // OrderBy
     public static final Comparator<Collection> orderByName = new Comparator<Collection>() {
@@ -189,14 +170,5 @@ public class Collection implements Parcelable, Jasonable {
         description = new Text(json.getJSONObject(COLUMN_DESCRIPTION));
         picture = json.getString(COLUMN_PICTURE);
         link = json.getString(COLUMN_LINK);
-    }
-
-    /// DB Management
-    public static void onCreate(SQLiteDatabase database) {
-        database.execSQL(DATABASE_CREATE);
-    }
-
-    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE + ";");
     }
 }

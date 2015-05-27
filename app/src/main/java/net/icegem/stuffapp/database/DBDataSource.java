@@ -1,4 +1,4 @@
-package net.icegem.stuffapp;
+package net.icegem.stuffapp.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import net.icegem.stuffapp.MutablePair;
+import net.icegem.stuffapp.SQLiteHelper;
+import net.icegem.stuffapp.Translated;
 import net.icegem.stuffapp.data.Collection;
 import net.icegem.stuffapp.data.Item;
 import net.icegem.stuffapp.data.Text;
@@ -33,10 +36,10 @@ public class DBDataSource {
         helper = new SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
             @Override
             public void onCreate(SQLiteDatabase database) {
-                Text.onCreate(database);
-                Collection.onCreate(database);
-                Type.onCreate(database);
-                Item.onCreate(database);
+                DBText.onCreate(database);
+                DBCollection.onCreate(database);
+                DBType.onCreate(database);
+                DBItem.onCreate(database);
             }
 
             @Override
@@ -44,10 +47,10 @@ public class DBDataSource {
 
                 Log.w(SQLiteHelper.class.getName(), "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
 
-                Text.onUpgrade(database, oldVersion, newVersion);
-                Collection.onUpgrade(database, oldVersion, newVersion);
-                Type.onUpgrade(database, oldVersion, newVersion);
-                Item.onUpgrade(database, oldVersion, newVersion);
+                DBText.onUpgrade(database, oldVersion, newVersion);
+                DBCollection.onUpgrade(database, oldVersion, newVersion);
+                DBType.onUpgrade(database, oldVersion, newVersion);
+                DBItem.onUpgrade(database, oldVersion, newVersion);
 
                 onCreate(database);
             }
