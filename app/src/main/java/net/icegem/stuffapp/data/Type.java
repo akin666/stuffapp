@@ -1,5 +1,6 @@
 package net.icegem.stuffapp.data;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -34,6 +35,11 @@ public class Type implements Parcelable, Jasonable {
                     ");";
 
     // Members
+
+    public void setName(Text name) {
+        this.name = name;
+    }
+
     private static int nid = 10;
 
     private int _id;
@@ -51,14 +57,17 @@ public class Type implements Parcelable, Jasonable {
         parse(json);
     }
 
-    public Text getName() {
-        return name;
-    }
-
     public int getId() {
         return _id;
     }
 
+    public void setId( int id ) {
+        _id = id;
+    }
+
+    public Text getName() {
+        return name;
+    }
 
     @Override
     public String toString() {
@@ -119,5 +128,14 @@ public class Type implements Parcelable, Jasonable {
     public void parse(JSONObject json) throws JSONException {
         _id = json.getInt(COLUMN_IDENTIFIER);
         name = new Text(json.getJSONObject(COLUMN_NAME));
+    }
+
+    /// DB Management
+    public static void onCreate(SQLiteDatabase database) {
+        database.execSQL(DATABASE_CREATE);
+    }
+
+    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE + ";");
     }
 }
