@@ -14,6 +14,7 @@ import android.widget.TextView;
 import net.icegem.stuffapp.Item;
 import net.icegem.stuffapp.ItemDataSource;
 import net.icegem.stuffapp.R;
+import net.icegem.stuffapp.database.DBConnection;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +23,7 @@ import org.json.JSONObject;
 import java.util.List;
 
 public class SettingsActivity extends AppCompatActivity {
-    private ItemDataSource datasource;
+    private DBConnection connection;
     private TextView dbText = null;
 
     @Override
@@ -32,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         dbText = (TextView)findViewById(R.id.db_text);
 
-        datasource = new ItemDataSource(this);
+        connection = new DBConnection(this);
     }
 
     @Override
@@ -67,12 +68,12 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
         } catch (JSONException e) {
-            Common.longLog(this, e);
+            Common.toastLong(this, e);
             return;
         }
 
         dbText.setText("");
-        Common.longLog(this, getString(R.string.db_import_success));
+        Common.toastLong(this, getString(R.string.db_import_success));
     }
 
     public void exportDB(View view) {
@@ -92,11 +93,11 @@ public class SettingsActivity extends AppCompatActivity {
         try {
             root.put("items" , array);
         } catch (JSONException e) {
-            Common.longLog(this, e);
+            Common.toastLong(this, e);
             return;
         }
         dbText.setText(root.toString());
-        Common.longLog(this, getString(R.string.db_export_success));
+        Common.toastLong(this, getString(R.string.db_export_success));
     }
 
     public void clearDB(View view) {
@@ -110,13 +111,13 @@ public class SettingsActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         datasource.deleteData();
-                        Common.longLog(context, successMsg);
+                        Common.toastLong(context, successMsg);
                     }
                 },
                 null);
     }
 
     public void languageChange(View view) {
-        Common.longLog(this,"Language Change not implemented.");
+        Common.toastLong(this, "Language Change not implemented.");
     }
 }

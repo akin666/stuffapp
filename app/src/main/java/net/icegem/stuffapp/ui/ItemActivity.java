@@ -16,9 +16,10 @@ import net.icegem.stuffapp.Item;
 import net.icegem.stuffapp.ItemDataSource;
 import net.icegem.stuffapp.R;
 import net.icegem.stuffapp.Settings;
+import net.icegem.stuffapp.database.DBConnection;
 
 public class ItemActivity extends AppCompatActivity {
-    private ItemDataSource datasource;
+    private DBConnection connection;
     private Item item = null;
     private int uid = 0;
 
@@ -30,7 +31,7 @@ public class ItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item);
 
-        datasource = new ItemDataSource(this);
+        connection = new DBConnection(this);
         Intent intent = getIntent();
 
         uid = intent.getIntExtra("id", -1);
@@ -60,7 +61,7 @@ public class ItemActivity extends AppCompatActivity {
         }
 
         if (item == null) {
-            Common.log(this, "Item does not exist.");
+            Common.toast(this, "Item does not exist.");
             return;
         }
 
@@ -124,7 +125,7 @@ public class ItemActivity extends AppCompatActivity {
             }
             case R.id.action_delete :
             {
-                Common.log(this, "delete requested");
+                Common.toast(this, "delete requested");
 
                 Common.question(
                         this,

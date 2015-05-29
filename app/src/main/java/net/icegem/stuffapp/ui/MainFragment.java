@@ -18,6 +18,7 @@ import net.icegem.stuffapp.Item;
 import net.icegem.stuffapp.ItemDataSource;
 import net.icegem.stuffapp.MainActivity;
 import net.icegem.stuffapp.R;
+import net.icegem.stuffapp.database.DBConnection;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ import java.util.List;
  */
 public class MainFragment extends Fragment implements SearchView.OnQueryTextListener {
 
-    private ItemDataSource datasource = null;
+    private DBConnection connection = null;
     private ListView itemlist = null;
     private SearchView search = null;
 
@@ -37,7 +38,7 @@ public class MainFragment extends Fragment implements SearchView.OnQueryTextList
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        datasource = new ItemDataSource(activity);
+        connection = new DBConnection(activity);
     }
 
     private void refresh()
@@ -64,7 +65,7 @@ public class MainFragment extends Fragment implements SearchView.OnQueryTextList
                         intent.putExtra("id", item.getUID());
                         startActivity(intent);
                     } catch (Exception e) {
-                        Common.log(getActivity(), "Exception: " + e.toString());
+                        Common.toast(getActivity(), "Exception: " + e.toString());
                     }
                 }
             });
@@ -74,7 +75,7 @@ public class MainFragment extends Fragment implements SearchView.OnQueryTextList
         }
         catch(Exception e)
         {
-            Common.log(getActivity(), e.toString());
+            Common.toast(getActivity(), e.toString());
         }
     }
 

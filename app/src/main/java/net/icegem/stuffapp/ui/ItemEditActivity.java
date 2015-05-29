@@ -15,10 +15,11 @@ import net.icegem.stuffapp.ItemDataSource;
 import net.icegem.stuffapp.R;
 import net.icegem.stuffapp.Settings;
 import net.icegem.stuffapp.Translated;
+import net.icegem.stuffapp.database.DBConnection;
 
 public class ItemEditActivity extends Activity {
 
-    private ItemDataSource datasource;
+    private DBConnection connection;
     private Item item = null;
     private int uid = 0;
     TextView itemId = null;
@@ -31,7 +32,7 @@ public class ItemEditActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_edit);
 
-        datasource = new ItemDataSource(this);
+        connection = new DBConnection(this);
 
         Intent intent = getIntent();
 
@@ -103,7 +104,7 @@ public class ItemEditActivity extends Activity {
     }
 
     public void readBarcode(View view) {
-        Common.longLog(this, getString(R.string.start_barcodereader));
+        Common.toastLong(this, getString(R.string.start_barcodereader));
 
         Barcode.read( this );
     }
@@ -117,12 +118,12 @@ public class ItemEditActivity extends Activity {
 
             datasource.save(item);
         } catch (Exception e) {
-            Common.longLog(this, "Failed to save item.: " + e.getMessage());
+            Common.toastLong(this, "Failed to save item.: " + e.getMessage());
         }
     }
 
     public void save(View view) {
-        Common.longLog(this, getString(R.string.save_item_edit));
+        Common.toastLong(this, getString(R.string.save_item_edit));
 
         save();
 
@@ -130,7 +131,7 @@ public class ItemEditActivity extends Activity {
     }
 
     public void cancel(View view) {
-        Common.longLog(this, getString(R.string.cancel_item_edit));
+        Common.toastLong(this, getString(R.string.cancel_item_edit));
 
         finish();
     }

@@ -44,7 +44,7 @@ public class TranslatedEditActivity extends Activity {
                 itemlist = (ListView) findViewById(R.id.translation_list);
                 itemlist.setAdapter(adapter);
             } catch (Exception e) {
-                Common.log(this, e.toString());
+                Common.toast(this, e.toString());
             }
         }
     }
@@ -63,7 +63,7 @@ public class TranslatedEditActivity extends Activity {
     }
 
     public void remove(View view) {
-        Common.log(this, "Clicked");
+        Common.toast(this, "Clicked");
     }
 
     public void add(View view) {
@@ -71,7 +71,7 @@ public class TranslatedEditActivity extends Activity {
     }
 
     public void save(View view) {
-        Common.longLog(this, getString(R.string.save_translation_edit));
+        Common.toastLong(this, getString(R.string.save_translation_edit));
 
         save();
 
@@ -79,7 +79,7 @@ public class TranslatedEditActivity extends Activity {
     }
 
     public void cancel(View view) {
-        Common.longLog(this, getString(R.string.cancel_translation_edit));
+        Common.toastLong(this, getString(R.string.cancel_translation_edit));
 
         finish();
     }

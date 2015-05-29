@@ -67,7 +67,7 @@ public class Barcode {
         }
         catch (ActivityNotFoundException anfe) {
             // Failed, Lets try to show "scanner dowload page"
-            Common.longLog(activity, activity.getString(R.string.barcodereader_not_found));
+            Common.toastLong(activity, activity.getString(R.string.barcodereader_not_found));
 
             Uri marketUri = Uri.parse("market://details?id=" + SCANNER_NAME);
             try {
@@ -76,7 +76,7 @@ public class Barcode {
             }
             catch (Exception e)
             {
-                Common.longLog(activity, "Failed to suggest app.: " + e.getMessage());
+                Common.toastLong(activity, "Failed to suggest app.: " + e.getMessage());
             }
         }
     }
