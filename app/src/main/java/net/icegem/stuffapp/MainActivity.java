@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void readBarcode(View view) {
-        Common.longLog(this, getString(R.string.start_barcodereader));
+        Common.toastLong(this, getString(R.string.start_barcodereader));
 
         Barcode.read( this );
     }

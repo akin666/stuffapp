@@ -112,7 +112,7 @@ public class ItemDataSource {
         }
         catch (Exception e)
         {
-            Common.log(context, e);
+            Common.toast(context, e);
         }
         finally {
             if( db != null )
@@ -141,7 +141,7 @@ public class ItemDataSource {
         }
         catch (Exception e)
         {
-            Common.log(context, e);
+            Common.toast(context, e);
         }
         finally {
             if( db != null )
@@ -160,7 +160,7 @@ public class ItemDataSource {
         }
         catch (Exception e)
         {
-            Common.log(context, e);
+            Common.toast(context, e);
         }
         finally {
             if( db != null )
@@ -197,7 +197,7 @@ public class ItemDataSource {
         }
         catch (Exception e)
         {
-            Common.log(context, e);
+            Common.toast(context, e);
         }
         finally {
             if( db != null )
@@ -236,7 +236,7 @@ public class ItemDataSource {
         }
         catch (Exception e)
         {
-            Common.log(context, e);
+            Common.toast(context, e);
         }
         finally {
             if( db != null )
@@ -269,7 +269,7 @@ public class ItemDataSource {
         }
         catch (Exception e)
         {
-            Common.log(context, e);
+            Common.toast(context, e);
         }
         finally {
             if( db != null )
@@ -302,7 +302,7 @@ public class ItemDataSource {
         }
         catch (Exception e)
         {
-            Common.log(context, e);
+            Common.toast(context, e);
         }
         finally {
             if( db != null )
@@ -325,7 +325,7 @@ public class ItemDataSource {
         }
         catch (Exception e)
         {
-            Common.log(context, e);
+            Common.toast(context, e);
         }
         finally {
             if( db != null )
