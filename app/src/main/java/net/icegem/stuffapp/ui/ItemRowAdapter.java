@@ -98,8 +98,7 @@ public class ItemRowAdapter extends BaseAdapter implements Filterable
         final View view;
         final Tag tag;
 
-        if(convertView == null)
-        {
+        if(convertView == null) {
             view = inflater.inflate(resourceId, parent, false);
             tag = new Tag();
             tag.name = (TextView)view.findViewById(R.id.name);
@@ -107,8 +106,7 @@ public class ItemRowAdapter extends BaseAdapter implements Filterable
             tag.type = (TextView)view.findViewById(R.id.type);
             view.setTag(tag);
         }
-        else
-        {
+        else {
             view = convertView;
             tag = (Tag)view.getTag();
         }

@@ -99,6 +99,13 @@ public class Collection implements Parcelable, Jasonable {
         link = value;
     }
 
+    /*
+    If any of the translations contains the "key" value.
+     */
+    public boolean contains(String key) {
+        return name.contains(key);
+    }
+
     @Override
     public String toString() {
         return name.toString();
@@ -139,13 +146,6 @@ public class Collection implements Parcelable, Jasonable {
         description = in.readParcelable(Text.class.getClassLoader());
         picture = in.readString();
         link = in.readString();
-    }
-
-    /*
-    If any of the translations contains the "key" value.
-     */
-    public boolean contains(String key)    {
-        return name.contains(key);
     }
 
     @Override
