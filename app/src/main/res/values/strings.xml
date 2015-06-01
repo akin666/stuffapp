@@ -40,4 +40,11 @@
 
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="import_export_helper">The \"export\" button produces the data in text, to the following textfield. The \"import\" button also uses the same textfield to import.</string>
+    <string name="title_activity_collection">CollectionActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_collection_edit">CollectionEditActivity</string>
+    <string name="edit_collection">Edit collection</string>
+    <string name="title_activity_type_edit">TypeEditActivity</string>
+    <string name="title_type_settings">Type settings</string>
 </resources>
