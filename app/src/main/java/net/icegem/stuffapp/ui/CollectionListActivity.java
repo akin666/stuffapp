@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Vector;
 
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class CollectionListActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private DBConnection connection = null;
     private ListView itemlist = null;
@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         connection = new DBConnection(this);
 
         itemlist = (ListView) findViewById(R.id.ItemList);
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     }
                     try {
                         Intent intent = new Intent(parentActivity, CollectionActivity.class);
-                        intent.putExtra("collection" , value);
+                        intent.putExtra(Collection.class.getName() , value);
                         startActivity(intent);
                     } catch (Exception e) {
                         Common.toast(parentActivity, e);
