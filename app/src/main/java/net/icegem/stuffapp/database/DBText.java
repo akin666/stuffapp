@@ -32,7 +32,7 @@ public class DBText {
                     Text.COLUMN_TEXT + " integer, " +
                     Text.COLUMN_LANGUAGE + " text not null," +
                     Text.COLUMN_VALUE + " text," +
-                    "PRIMARY KEY (" + Text.COLUMN_IDENTIFIER + "," + Text.COLUMN_LANGUAGE + "));";
+                    "PRIMARY KEY (" + Text.COLUMN_TEXT + "," + Text.COLUMN_LANGUAGE + "));";
 
     public static final String DATABASE_CREATE =
             "CREATE TABLE IF NOT EXISTS " + TABLE + "(" +

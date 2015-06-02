@@ -1,20 +1,15 @@
 package net.icegem.stuffapp.ui;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 import net.icegem.stuffapp.Barcode;
-import net.icegem.stuffapp.Item;
-import net.icegem.stuffapp.ItemDataSource;
 import net.icegem.stuffapp.R;
-import net.icegem.stuffapp.Settings;
-import net.icegem.stuffapp.Translated;
+import net.icegem.stuffapp.data.Item;
+import net.icegem.stuffapp.data.Text;
 import net.icegem.stuffapp.database.DBConnection;
 
 public class ItemEditActivity extends Activity {
@@ -35,61 +30,44 @@ public class ItemEditActivity extends Activity {
         connection = new DBConnection(this);
 
         Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
 
-        uid = intent.getIntExtra("id", -1);
+        item = bundle.getParcelable(Item.class.getName());
 
-        if( uid == -1 )
-        {
-            try
-            {
-                item = new Item("","");
-                uid = item.getUID();
-            }
-            catch (Exception e)
-            {
-            }
-        }
-        else
-        {
-            try
-            {
-                item = datasource.getItem(uid);
-            }
-            catch (Exception e)
-            {
-            }
+        if( item == null ) {
+            item = new Item();
         }
 
-        refreshPage();
+        itemId = (TextView)findViewById(R.id.item_id);
+        itemLocation = (TextView)findViewById(R.id.item_location);
+        itemName = (TextView)findViewById(R.id.item_name);
+        itemType = (TextView)findViewById(R.id.type);
+
+        refresh();
     }
 
-    public void refreshPage()
+    public void refresh()
     {
-        if( item != null ) {
-            itemId = (TextView)findViewById(R.id.item_id);
-            itemLocation = (TextView)findViewById(R.id.item_location);
-            itemName = (TextView)findViewById(R.id.item_name);
-            itemType = (TextView)findViewById(R.id.type);
+        itemId.setText( item.getId() );
+        itemLocation.setText( item.getLocation() );
+        itemName.setText(item.getVolume());
+        itemType.setText(item.getType().toString());
 
-            itemId.setText( item.getID() );
-            itemLocation.setText( item.getLocation() );
-            itemName.setText(item.getName());
-            itemType.setText(item.getType());
+        /*
+        final Activity activity = this;
+        itemName.setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(activity, TextEditActivity.class);
 
-            final Activity activity = this;
-            itemName.setOnClickListener(new AdapterView.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(activity, TranslatedEditActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("translated", item.getNameObject());
+                intent.putExtras(bundle);
 
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("translated", item.getNameObject());
-                    intent.putExtras(bundle);
-
-                    startActivityForResult(intent, 0);
-                }
-            });
-        }
+                startActivityForResult(intent, 0);
+            }
+        });
+        */
     }
 
     @Override
@@ -97,8 +75,7 @@ public class ItemEditActivity extends Activity {
         super.onResume();
 
         String barcodeResult = Barcode.getLastResult();
-        if( barcodeResult != null )
-        {
+        if( barcodeResult != null ) {
             barcode(barcodeResult);
         }
     }
@@ -111,6 +88,7 @@ public class ItemEditActivity extends Activity {
 
     public void save()
     {
+        /*
         try {
             item.setId(itemId.getText().toString());
             item.setLocation(itemLocation.getText().toString());
@@ -120,6 +98,7 @@ public class ItemEditActivity extends Activity {
         } catch (Exception e) {
             Common.toastLong(this, "Failed to save item.: " + e.getMessage());
         }
+        */
     }
 
     public void save(View view) {
@@ -136,43 +115,40 @@ public class ItemEditActivity extends Activity {
         finish();
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent intent)
-    {
-        if( Barcode.onActivityResult(requestCode, resultCode, intent) )
-        {
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if( Barcode.onActivityResult(requestCode, resultCode, intent) ) {
             return;
         }
 
-        if( intent == null )
-        {
+        if( intent == null ) {
             return;
         }
 
         String action = intent.getAction();
-        if( action == null )
-        {
+        if( action == null ) {
             return;
         }
 
         // Translation action.
-        if(action.equals(Translated.ACTION)) {
+        if(action.equals(Text.EDIT_ACTION)) {
             if (resultCode == RESULT_OK) {
                 Bundle bundle = intent.getExtras();
 
-                Translated translated = bundle.getParcelable("translated");
+                String target = bundle.getParcelable(Text.TARGET);
+                Text text = bundle.getParcelable(Text.class.getName());
 
-                if( translated != null )
-                {
+                if( text != null ) {
+                    /*
                     item.setName(translated);
                     itemName.setText( item.getName() );
+                    */
                 }
             }
         }
     }
 
     public void barcode(String result) {
-        if( itemId != null )
-        {
+        if( itemId != null ) {
             itemId.setText(result);
         }
     }

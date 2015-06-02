@@ -26,6 +26,9 @@ public class Text implements Parcelable, Jasonable {
     public static final String EDIT_ACTION = "Text_Edit_Action";
     public static final String VIEW_ACTION = "Text_View_Action";
 
+    // Target
+    public static final String TARGET = "Key";
+
     // universal column strings
     public static final String COLUMN_IDENTIFIER = "_id";
     public static final String COLUMN_LANGUAGE = "language";

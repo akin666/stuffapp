@@ -19,7 +19,7 @@ import java.util.List;
 public class UIITem {
     public static class RowAdapter  extends net.icegem.stuffapp.ui.RowAdapter<Item> implements Filterable {
         public RowAdapter(Context context, List<Item> items) {
-            super(context, R.layout.row_collection_view, items);
+            super(context, R.layout.row_item_view, items);
         }
 
         public Filter getFilter() {
@@ -52,6 +52,8 @@ public class UIITem {
 
         private class Tag {
             public TextView name;
+            public TextView type;
+            public TextView location;
         }
 
         @Override
@@ -62,8 +64,11 @@ public class UIITem {
             if(convertView == null) {
                 view = inflater.inflate(resourceId, parent, false);
                 tag = new Tag();
-                tag.name = (TextView)view.findViewById(R.id.name);
                 view.setTag(tag);
+
+                tag.name = (TextView)view.findViewById(R.id.name);
+                tag.type = (TextView)view.findViewById(R.id.type);
+                tag.location = (TextView)view.findViewById(R.id.location);
             }
             else {
                 view = convertView;
@@ -73,6 +78,8 @@ public class UIITem {
             Item item = (Item)getItem(position);
 
             tag.name.setText( item.getVolume().toString() );
+            tag.type.setText( item.getType().toString() );
+            tag.location.setText( item.getLocation() );
 
             return view;
         }

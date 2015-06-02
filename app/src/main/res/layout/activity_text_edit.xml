@@ -4,12 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="net.icegem.stuffapp.ui.TranslatedEditActivity">
+    tools:context="net.icegem.stuffapp.ui.TextEditActivity">
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/translation_list"
+        android:id="@+id/list"
         android:layout_margin="5dp">
     </ListView>
 

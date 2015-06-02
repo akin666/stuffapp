@@ -11,10 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import net.icegem.stuffapp.Item;
-import net.icegem.stuffapp.ItemDataSource;
 import net.icegem.stuffapp.R;
+import net.icegem.stuffapp.data.Item;
 import net.icegem.stuffapp.database.DBConnection;
+import net.icegem.stuffapp.database.DBItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,8 +50,7 @@ public class SettingsActivity extends AppCompatActivity {
         // Get all data to DB..
         String jsonString = dbText.getText().toString();
 
-        if( jsonString == null || jsonString.isEmpty() )
-        {
+        if( jsonString == null || jsonString.isEmpty() ) {
             return;
         }
 
@@ -59,12 +58,11 @@ public class SettingsActivity extends AppCompatActivity {
             JSONObject root =  new JSONObject(jsonString);
             JSONArray array = root.getJSONArray("items");
 
-            for( int i = 0 ; i < array.length() ; ++i )
-            {
+            for( int i = 0 ; i < array.length() ; ++i ) {
                 JSONObject object = array.getJSONObject(i);
 
                 Item item = new Item(object);
-                datasource.save(item);
+                DBItem.save( connection , item );
             }
 
         } catch (JSONException e) {
@@ -78,11 +76,11 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void exportDB(View view) {
         // Get all data from DB..
+        /*
         List<Item> items = datasource.getItems();
 
         JSONArray array = new JSONArray();
-        for(final Item item : items)
-        {
+        for(final Item item : items) {
             JSONObject object = item.toJSON();
             if( object != null ) {
                 array.put(object);
@@ -98,6 +96,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
         dbText.setText(root.toString());
         Common.toastLong(this, getString(R.string.db_export_success));
+        */
     }
 
     public void clearDB(View view) {
@@ -110,7 +109,7 @@ public class SettingsActivity extends AppCompatActivity {
                 getString(R.string.db_clear_message),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        datasource.deleteData();
+                        connection.clear();
                         Common.toastLong(context, successMsg);
                     }
                 },

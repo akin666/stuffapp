@@ -2,7 +2,6 @@ package net.icegem.stuffapp.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -17,17 +16,16 @@ import android.widget.SearchView;
 import net.icegem.stuffapp.Barcode;
 import net.icegem.stuffapp.R;
 import net.icegem.stuffapp.data.Collection;
-import net.icegem.stuffapp.data.Item;
 import net.icegem.stuffapp.database.DBCollection;
 import net.icegem.stuffapp.database.DBConnection;
-import net.icegem.stuffapp.database.DBItem;
 
 import java.util.List;
 
+
 public class CollectionActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
-    private Collection collection = null;
+
     private DBConnection connection = null;
-    private ListView itemlist = null;
+    private ListView list = null;
     private SearchView search = null;
 
     @Override
@@ -37,32 +35,21 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
 
         connection = new DBConnection(this);
 
-        itemlist = (ListView) findViewById(R.id.ItemList);
+        list = (ListView) findViewById(R.id.list);
         search = (SearchView) findViewById(R.id.search);
-
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-
-        collection = bundle.getParcelable(Collection.class.getName());
-
-        if( collection == null )
-        {
-            collection = new Collection();
-        }
-
-        refresh();
     }
+
     private void refresh() {
-        if( connection == null || itemlist == null ) {
+        if( connection == null || list == null ) {
             return;
         }
 
         try {
-            List<Item> values = DBItem.listByCollection(connection, collection.getId());
-            ListAdapter adapter = new UIITem.RowAdapter(this, values);
-            itemlist.setAdapter(adapter);
+            List<Collection> values = DBCollection.list(connection);
+            ListAdapter adapter = new UICollection.RowAdapter(this, values);
+            list.setAdapter(adapter);
             final Activity parentActivity = this;
-            itemlist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Collection value = (Collection) parent.getItemAtPosition(position);
@@ -70,7 +57,7 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
                         return;
                     }
                     try {
-                        Intent intent = new Intent(parentActivity, CollectionActivity.class);
+                        Intent intent = new Intent(parentActivity, CollectionViewActivity.class);
                         intent.putExtra(Collection.class.getName() , value);
                         startActivity(intent);
                     } catch (Exception e) {
@@ -79,14 +66,13 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
                 }
             });
 
-            itemlist.setTextFilterEnabled(true);
+            list.setTextFilterEnabled(true);
             setupSearch();
         }
         catch(Exception e) {
             Common.toast(this, e.toString());
         }
     }
-
 
     private void setupSearch() {
         search.setIconifiedByDefault(true);
@@ -99,9 +85,9 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
     @Override
     public boolean onQueryTextChange(String newText) {
         if (TextUtils.isEmpty(newText)) {
-            itemlist.clearTextFilter();
+            list.clearTextFilter();
         } else {
-            itemlist.setFilterText(newText);
+            list.setFilterText(newText);
         }
         return true;
     }
@@ -114,7 +100,7 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_collection, menu);
         return true;
     }
 
