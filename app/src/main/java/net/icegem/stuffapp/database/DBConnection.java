@@ -3,10 +3,6 @@ package net.icegem.stuffapp.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
-import net.icegem.stuffapp.Constants;
-import net.icegem.stuffapp.SQLiteHelper;
 import net.icegem.stuffapp.ui.Common;
 
 /**

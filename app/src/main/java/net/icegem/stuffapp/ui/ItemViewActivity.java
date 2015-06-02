@@ -2,6 +2,7 @@ package net.icegem.stuffapp.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -10,67 +11,64 @@ import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
-import net.icegem.stuffapp.Item;
-import net.icegem.stuffapp.ItemDataSource;
+import net.icegem.stuffapp.data.Item;
 import net.icegem.stuffapp.R;
 import net.icegem.stuffapp.Settings;
 import net.icegem.stuffapp.database.DBConnection;
+import net.icegem.stuffapp.database.DBItem;
 
-public class ItemActivity extends AppCompatActivity {
+public class ItemViewActivity extends AppCompatActivity {
     private DBConnection connection;
     private Item item = null;
     private int uid = 0;
 
     private WebView web = null;
-    private TextView tv = null;
+    private TextView location = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_item);
+        setContentView(R.layout.activity_item_view);
 
         connection = new DBConnection(this);
+
+        web = (WebView) findViewById(R.id.webView);
+        location = (TextView) findViewById(R.id.location);
+
         Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
 
-        uid = intent.getIntExtra("id", -1);
+        item = bundle.getParcelable(Item.class.getName());
 
-        if( uid == -1 )
-        {
-            throw new RuntimeException("ItemActivity requires item ID.");
+        if( item == null ) {
+            throw new Resources.NotFoundException("No item specified. You should call ItemEditActivity instead.");
         }
 
-        tv = (TextView) findViewById(R.id.location);
-        web = (WebView) findViewById(R.id.webView);
-
-        refreshPage();
+        refresh();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        refreshPage();
+        refresh();
     }
 
-    public void refreshPage() {
-        try {
-            item = datasource.getItem(uid);
-        } catch (Exception e) {
-            throw new RuntimeException("ItemActivity requires item ID.");
-        }
-
+    public void refresh() {
         if (item == null) {
             Common.toast(this, "Item does not exist.");
             return;
         }
 
-        tv.setText(item.getLocation());
+        location.setText(item.getLocation());
 
-        String itemID = item.getID();
-        if (itemID != null && (!itemID.isEmpty()))
+        String code = item.getCode();
+        if (code != null && (!code.isEmpty()))
         {
-            String url = Settings.searchUrl + itemID;
+            String url = Settings.searchUrl + code;
 
             WebSettings settings = web.getSettings();
             settings.setJavaScriptEnabled(true);
@@ -119,7 +117,7 @@ public class ItemActivity extends AppCompatActivity {
             case R.id.action_edit :
             {
                 Intent intent = new Intent(this, ItemEditActivity.class);
-                intent.putExtra("id" , item.getUID() );
+                intent.putExtra(Item.class.getName() , item);
                 startActivity(intent);
                 return true;
             }
@@ -133,7 +131,7 @@ public class ItemActivity extends AppCompatActivity {
                         getString(R.string.delete_item_sure),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                datasource.deleteItem(uid);
+                                DBItem.delete(connection, item);
                                 finish();
                             }
                         },
@@ -143,7 +141,7 @@ public class ItemActivity extends AppCompatActivity {
             }
             case R.id.action_reset :
             {
-                refreshPage();
+                refresh();
                 return true;
             }
             default:

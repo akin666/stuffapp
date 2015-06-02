@@ -1,3 +1,4 @@
+/*
 package net.icegem.stuffapp;
 
 import android.content.ContentValues;
@@ -13,7 +14,7 @@ import java.util.List;
 
 /**
  * Created by mikael.korpela on 19.5.2015.
- */
+ * /
 public class ItemDataSource {
     private SQLiteHelper helper;
     private Context context;
@@ -335,3 +336,4 @@ public class ItemDataSource {
         }
     }
 }
+*/
