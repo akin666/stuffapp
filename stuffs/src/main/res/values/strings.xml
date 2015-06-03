@@ -47,4 +47,11 @@
     <string name="edit_collection">Edit collection</string>
     <string name="title_activity_type_edit">TypeEditActivity</string>
     <string name="title_type_settings">Type settings</string>
+    <string name="types_header">Types</string>
+    <string name="language_header">Language</string>
+    <string name="database_header">Database</string>
+    <string name="edit_types">Edit types</string>
+    <string name="types_add">Add type</string>
+    <string name="type_remove_topic">Remove type?</string>
+    <string name="type_remove_message">Do you want to remove the type?</string>
 </resources>

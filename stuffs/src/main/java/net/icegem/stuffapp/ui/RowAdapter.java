@@ -18,11 +18,15 @@ public abstract class RowAdapter<T> extends BaseAdapter {
     public RowAdapter(Context context, int resourceId, List<T> original)
     {
         super();
+        setup(original);
 
         this.inflater = LayoutInflater.from(context);
+        this.resourceId = resourceId;
+    }
+
+    public void setup( List<T> original ) {
         this.original = original;
         this.list = original;
-        this.resourceId = resourceId;
     }
 
     public void notifyDataSetChanged() {
