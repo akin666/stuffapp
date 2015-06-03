@@ -17,7 +17,7 @@ import java.util.List;
  * Created by mikael.korpela on 1.6.2015.
  */
 public class UIITem {
-    public static class RowAdapter  extends net.icegem.stuffapp.ui.RowAdapter<Item> implements Filterable {
+    public static class RowAdapter extends net.icegem.stuffapp.ui.RowAdapter<Item> implements Filterable {
         public RowAdapter(Context context, List<Item> items) {
             super(context, R.layout.row_item_view, items);
         }

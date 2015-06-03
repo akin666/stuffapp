@@ -24,7 +24,6 @@ public class Text implements Parcelable, Jasonable {
 
     // Actions
     public static final String EDIT_ACTION = "Text_Edit_Action";
-    public static final String VIEW_ACTION = "Text_View_Action";
 
     // Target
     public static final String TARGET = "Key";
@@ -159,8 +158,27 @@ public class Text implements Parcelable, Jasonable {
         return get();
     }
 
+    // TODO! Equals and CompareTo are bit hazzle at the moment, fix the concept!
     public int compareTo(Text other) {
         return get().compareTo(other.get());
+    }
+
+    public boolean equals(Text other) {
+        // We are assuming that the objects are ordered with the sort() function always.
+        final Vector<MutablePair<String, String>> a = this.values;
+        final Vector<MutablePair<String, String>> b = other.values;
+
+        if( a.size() != b.size() ) {
+            return false;
+        }
+
+        final int length = a.size();
+        for( int i = 0 ; i != length ; ++i ) {
+            if( !a.elementAt(i).equals(b.elementAt(i)) ) {
+                return false;
+            }
+        }
+        return true;
     }
 
     //// Parcelable

@@ -3,9 +3,11 @@ package net.icegem.stuffapp.database;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 import net.icegem.stuffapp.MutablePair;
 import net.icegem.stuffapp.data.Text;
+import net.icegem.stuffapp.ui.Common;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,21 +116,28 @@ public class DBText {
         // NEW!
         if( id < 0 )
         {
-            id = (int)db.insert(TABLE, null, null);
+            Common.log("inserting " + id);
+            id = (int)db.insert(TABLE, null, new ContentValues());
             item.setId(id);
+            Common.log("got " + id);
         }
 
         // Save the texts themselves
         for( int i = 0 ; i < item.size() ; ++i ) {
             MutablePair<String,String> pair = item.at(i);
-            db.execSQL("INSERT OR REPLACE INTO " + TABLE_TRANSLATE + " (" +
+
+            final String query = "INSERT OR REPLACE INTO " + TABLE_TRANSLATE + " (" +
                     Text.COLUMN_TEXT + ", " +
                     Text.COLUMN_LANGUAGE + ", " +
                     Text.COLUMN_VALUE + " VALUES ( " +
                     id + ", " +
                     "'" + pair.first + "', " +
                     "'" + pair.second + "' " +
-                    ")", null);
+                    ")";
+
+            Common.log(query);
+
+            db.execSQL(query , null);
         }
 
         return item;

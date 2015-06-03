@@ -11,4 +11,8 @@ public class MutablePair<F, S> {
         this.first = first;
         this.second = second;
     }
+
+    public boolean equals( final MutablePair<F, S> other ) {
+        return first.equals(other.first) && second.equals(other.second);
+    }
 }
