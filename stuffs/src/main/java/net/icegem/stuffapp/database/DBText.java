@@ -114,12 +114,11 @@ public class DBText {
         int id = item.getId();
 
         // NEW!
-        if( id < 0 )
-        {
-            Common.log("inserting " + id);
-            id = (int)db.insert(TABLE, null, new ContentValues());
+        if( id < 0 ) {
+            ContentValues values = new ContentValues();
+            values.put(Text.COLUMN_IDENTIFIER , (String)null);
+            id = (int)db.insert(TABLE, null, values);
             item.setId(id);
-            Common.log("got " + id);
         }
 
         // Save the texts themselves
@@ -129,15 +128,13 @@ public class DBText {
             final String query = "INSERT OR REPLACE INTO " + TABLE_TRANSLATE + " (" +
                     Text.COLUMN_TEXT + ", " +
                     Text.COLUMN_LANGUAGE + ", " +
-                    Text.COLUMN_VALUE + " VALUES ( " +
+                    Text.COLUMN_VALUE + " ) VALUES ( " +
                     id + ", " +
                     "'" + pair.first + "', " +
                     "'" + pair.second + "' " +
                     ")";
 
-            Common.log(query);
-
-            db.execSQL(query , null);
+            db.execSQL(query);
         }
 
         return item;
