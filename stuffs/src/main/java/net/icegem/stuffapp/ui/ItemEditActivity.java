@@ -110,7 +110,7 @@ public class ItemEditActivity extends Activity {
     }
 
     public void cancel(View view) {
-        Common.toastLong(this, getString(R.string.cancel_item_edit));
+        Common.toastLong(this, getString(R.string.action_cancel));
 
         finish();
     }

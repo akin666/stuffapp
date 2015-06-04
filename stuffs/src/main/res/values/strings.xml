@@ -17,10 +17,8 @@
     <string name="start_barcodereader">Starting barcode reader..</string>
     <string name="barcodereader_not_found">No barcode scanner app found.</string>
     <string name="title_activity_item_edit">ItemEditActivity</string>
-    <string name="cancel_item_edit">Cancelled item edit..</string>
     <string name="save_item_edit">Saving item..</string>
-    <string name="cancel_translation_edit">Cancelled translation edit..</string>
-    <string name="save_translation_edit">Saving translation..</string>
+    <string name="save_translation_edit">Saving text..</string>
     <string name="add_name">Add name</string>
     <string name="remove_sign">⌫</string>
     <string name="add_translation">Add translation</string>
@@ -54,4 +52,9 @@
     <string name="types_add">Add type</string>
     <string name="type_remove_topic">Remove type?</string>
     <string name="type_remove_message">Do you want to remove the type?</string>
+    <string name="description">Description</string>
+    <string name="picture">Picture</string>
+    <string name="link">Link</string>
+    <string name="action_cancel">Cancelled action</string>
+    <string name="action_save_collection">Saving collection</string>
 </resources>
