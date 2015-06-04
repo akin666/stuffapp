@@ -20,7 +20,6 @@ import java.util.Iterator;
 public class Collection implements Parcelable, Jasonable {
     // Actions
     public static final String EDIT_ACTION = "Collection_Edit_Action";
-    public static final String VIEW_ACTION = "Collection_View_Action";
 
     // DB Strings
     public static final String COLUMN_IDENTIFIER = "_id";

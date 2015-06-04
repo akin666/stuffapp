@@ -27,6 +27,7 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
     private DBConnection connection = null;
     private ListView list = null;
     private SearchView search = null;
+    UICollection.Manager manager = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,17 +38,15 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
 
         list = (ListView) findViewById(R.id.list);
         search = (SearchView) findViewById(R.id.search);
+
+        manager = new UICollection.Manager(this, connection);
+
+        refresh();
     }
 
     private void refresh() {
-        if( connection == null || list == null ) {
-            return;
-        }
-
         try {
-            List<Collection> values = DBCollection.list(connection);
-            ListAdapter adapter = new UICollection.RowAdapter(this, values);
-            list.setAdapter(adapter);
+            list.setAdapter(manager);
             final Activity parentActivity = this;
             list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -70,7 +69,7 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
             setupSearch();
         }
         catch(Exception e) {
-            Common.toast(this, e.toString());
+            Common.toast(this, e);
         }
     }
 
@@ -117,8 +116,8 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
                 return true;
             }
             case R.id.action_new : {
-                Intent intent = new Intent(this, ItemEditActivity.class);
-                startActivity(intent);
+                Intent intent = new Intent(this, CollectionEditActivity.class);
+                startActivityForResult(intent , 0);
                 return true;
             }
             case R.id.action_about : {
@@ -156,6 +155,28 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        Barcode.onActivityResult(requestCode, resultCode, intent);
+        if( Barcode.onActivityResult(requestCode, resultCode, intent) ) {
+            return;
+        }
+
+        if( intent == null ) {
+            return;
+        }
+
+        String action = intent.getAction();
+        if( action == null ) {
+            return;
+        }
+
+        // Collection action.
+        if(action.equals(Collection.EDIT_ACTION)) {
+            if (resultCode == RESULT_OK) {
+                Collection collection = (Collection)intent.getParcelableExtra( Collection.class.getName() );
+
+                if( collection != null ) {
+                    manager.save(collection);
+                }
+            }
+        }
     }
 }

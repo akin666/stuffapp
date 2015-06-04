@@ -29,8 +29,7 @@ public class TextEditActivity extends Activity {
         target = bundle.getString(Text.TARGET);
         extra = bundle.getParcelable(Text.EXTRA);
 
-        if( text == null )
-        {
+        if( text == null ) {
             text = new Text();
         }
         list = (ListView) findViewById(R.id.list);
@@ -38,8 +37,7 @@ public class TextEditActivity extends Activity {
         refresh();
     }
 
-    public void refresh()
-    {
+    public void refresh() {
         if( text != null ) {
             try {
                 adapter = new UIText.RowAdapter(this, R.layout.row_text_edit, text);
@@ -50,8 +48,7 @@ public class TextEditActivity extends Activity {
         }
     }
 
-    public void save()
-    {
+    public void save() {
         Intent intent = new Intent();
 
         intent.putExtra(Text.class.getName(), text);
@@ -80,7 +77,7 @@ public class TextEditActivity extends Activity {
     }
 
     public void cancel(View view) {
-        Common.toastLong(this, getString(R.string.cancel_translation_edit));
+        Common.toastLong(this, getString(R.string.action_cancel));
 
         finish();
     }
