@@ -150,7 +150,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void addType(View view) {
-        typeManager.add(new Type());
+        typeManager.save(new Type());
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -175,9 +175,15 @@ public class SettingsActivity extends AppCompatActivity {
 
                 // Save the database item..
                 DBText.save( connection , text );
-
                 if( target.equals(Type.class.getName()) ) {
-                    typeManager.update();
+                    Type type = (Type)intent.getParcelableExtra( Text.EXTRA );
+                    if( type != null ) {
+                        type.setName(text);
+                        typeManager.save(type);
+                    }
+                    else {
+                        Common.log("Error, Extra TYPE object was null");
+                    }
                 }
             }
         }

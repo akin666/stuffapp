@@ -43,15 +43,16 @@ public class UIType {
             return -1;
         }
 
-        public void add( Type type ) {
+        public void save( Type type ) {
             if( type == null ) {
                 return;
             }
             type = DBType.save(connection , type );
-
             int location = findLocation(type);
             if( location < 0) {
                 original.add(type);
+            } else {
+                original.set( location , type );
             }
 
             notifyDataSetChanged();
@@ -100,17 +101,17 @@ public class UIType {
                 tag.remove.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Common.question(
-                                activity,
-                                activity.getString(R.string.type_remove_topic),
-                                activity.getString(R.string.type_remove_message),
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        manager.remove(tag.type);
-                                        tag.type = null;
-                                    }
-                                },
-                                null);
+                    Common.question(
+                        activity,
+                        activity.getString(R.string.type_remove_topic),
+                        activity.getString(R.string.type_remove_message),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                manager.remove(tag.type);
+                                tag.type = null;
+                            }
+                        },
+                        null);
                     }
                 });
 
@@ -118,8 +119,11 @@ public class UIType {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(activity, TextEditActivity.class);
+
                         intent.putExtra(Text.class.getName() , tag.type.getName());
                         intent.putExtra(Text.TARGET , Type.class.getName() );
+                        intent.putExtra(Text.EXTRA , tag.type );
+
                         activity.startActivityForResult(intent, 0);
                     }
                 });
