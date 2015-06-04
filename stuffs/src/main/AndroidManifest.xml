@@ -62,6 +62,7 @@
             android:name=".ui.SettingsActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_settings"
+            android:windowSoftInputMode="stateHidden"
             android:parentActivityName=".ui.CollectionActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
