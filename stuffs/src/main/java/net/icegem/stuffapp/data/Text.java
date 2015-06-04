@@ -27,6 +27,7 @@ public class Text implements Parcelable, Jasonable {
 
     // Target
     public static final String TARGET = "Key";
+    public static final String EXTRA = "Extra";
 
     // universal column strings
     public static final String COLUMN_IDENTIFIER = "_id";
@@ -76,7 +77,7 @@ public class Text implements Parcelable, Jasonable {
         if( lang == Settings.language ) {
             // lets be nice..
             // We could throw, and that would be preferrable in debug situations.
-            return "" + _id;
+            return "";
         }
         return get(null);
     }

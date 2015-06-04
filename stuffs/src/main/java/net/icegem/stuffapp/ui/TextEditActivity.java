@@ -3,6 +3,7 @@ package net.icegem.stuffapp.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.ListView;
 
@@ -12,6 +13,7 @@ import net.icegem.stuffapp.data.Text;
 public class TextEditActivity extends Activity {
     private Text text = null;
     private String target = null;
+    private Parcelable extra = null;
     private UIText.RowAdapter adapter = null;
     private ListView list = null;
 
@@ -25,6 +27,7 @@ public class TextEditActivity extends Activity {
 
         text = bundle.getParcelable(Text.class.getName());
         target = bundle.getString(Text.TARGET);
+        extra = bundle.getParcelable(Text.EXTRA);
 
         if( text == null )
         {
@@ -54,6 +57,9 @@ public class TextEditActivity extends Activity {
         intent.putExtra(Text.class.getName(), text);
         if( target != null ) {
             intent.putExtra(Text.TARGET, target);
+        }
+        if( extra != null ) {
+            intent.putExtra(Text.EXTRA, extra);
         }
         intent.setAction( Text.EDIT_ACTION );
 
