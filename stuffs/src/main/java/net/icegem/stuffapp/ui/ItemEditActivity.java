@@ -10,6 +10,7 @@ import net.icegem.stuffapp.Barcode;
 import net.icegem.stuffapp.R;
 import net.icegem.stuffapp.data.Item;
 import net.icegem.stuffapp.data.Text;
+import net.icegem.stuffapp.data.Type;
 import net.icegem.stuffapp.database.DBConnection;
 
 public class ItemEditActivity extends Activity {
@@ -17,10 +18,14 @@ public class ItemEditActivity extends Activity {
     private DBConnection connection;
     private Item item = null;
     private int uid = 0;
-    TextView itemId = null;
-    TextView itemLocation = null;
-    TextView itemType = null;
-    TextView itemName = null;
+
+    TextView code = null;
+    TextView description = null;
+    TextView type = null;
+    TextView volume = null;
+    TextView link = null;
+    TextView picture = null;
+    TextView location = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,21 +45,33 @@ public class ItemEditActivity extends Activity {
             item = new Item();
         }
 
-        itemId = (TextView)findViewById(R.id.item_id);
-        itemLocation = (TextView)findViewById(R.id.item_location);
-        itemName = (TextView)findViewById(R.id.item_name);
-        itemType = (TextView)findViewById(R.id.type);
+        code = (TextView)findViewById(R.id.code);
+        description = (TextView)findViewById(R.id.description);
+        type = (TextView)findViewById(R.id.type);
+        volume = (TextView)findViewById(R.id.volume);
+        link = (TextView)findViewById(R.id.link);
+        picture = (TextView)findViewById(R.id.picture);
+        location = (TextView)findViewById(R.id.location);
 
         refresh();
     }
 
     public void refresh()
     {
+        Text descriptiontmp = item.getDescription();
+        Type typetmp = item.getType();
 
-        itemId.setText( item.getId() );
-        itemLocation.setText( item.getLocation() );
-        itemName.setText(item.getVolume());
-        itemType.setText(item.getType().toString());
+        code.setText( item.getCode() );
+        if( descriptiontmp != null ) {
+            description.setText(descriptiontmp.toString());
+        }
+        if( typetmp != null ) {
+            type.setText( typetmp.toString() );
+        }
+        volume.setText( item.getVolume() );
+        link.setText( item.getLink() );
+        picture.setText( item.getPicture() );
+        location.setText(item.getLocation());
 
         /*
         final Activity activity = this;
@@ -151,8 +168,8 @@ public class ItemEditActivity extends Activity {
     }
 
     public void barcode(String result) {
-        if( itemId != null ) {
-            itemId.setText(result);
+        if( code != null ) {
+            code.setText(result);
         }
     }
 }
