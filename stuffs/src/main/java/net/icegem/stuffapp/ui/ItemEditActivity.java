@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.icegem.stuffapp.Barcode;
@@ -12,6 +15,9 @@ import net.icegem.stuffapp.data.Item;
 import net.icegem.stuffapp.data.Text;
 import net.icegem.stuffapp.data.Type;
 import net.icegem.stuffapp.database.DBConnection;
+import net.icegem.stuffapp.database.DBType;
+
+import java.util.List;
 
 public class ItemEditActivity extends Activity {
 
@@ -19,9 +25,10 @@ public class ItemEditActivity extends Activity {
     private Item item = null;
     private int uid = 0;
 
+    List<Type> types;
     TextView code = null;
     TextView description = null;
-    TextView type = null;
+    Spinner type = null;
     TextView volume = null;
     TextView link = null;
     TextView picture = null;
@@ -47,47 +54,80 @@ public class ItemEditActivity extends Activity {
 
         code = (TextView)findViewById(R.id.code);
         description = (TextView)findViewById(R.id.description);
-        type = (TextView)findViewById(R.id.type);
+        type = (Spinner)findViewById(R.id.type);
         volume = (TextView)findViewById(R.id.volume);
         link = (TextView)findViewById(R.id.link);
         picture = (TextView)findViewById(R.id.picture);
         location = (TextView)findViewById(R.id.location);
 
-        refresh();
-    }
-
-    public void refresh()
-    {
-        Text descriptiontmp = item.getDescription();
-        Type typetmp = item.getType();
-
-        code.setText( item.getCode() );
-        if( descriptiontmp != null ) {
-            description.setText(descriptiontmp.toString());
-        }
-        if( typetmp != null ) {
-            type.setText( typetmp.toString() );
-        }
-        volume.setText( item.getVolume() );
-        link.setText( item.getLink() );
-        picture.setText( item.getPicture() );
-        location.setText(item.getLocation());
-
-        /*
+        // Add click listener, so that we can edit the Text object in a different way..
+        final Item item = this.item;
         final Activity activity = this;
-        itemName.setOnClickListener(new AdapterView.OnClickListener() {
+        description.setOnClickListener(new AdapterView.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, TextEditActivity.class);
 
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("translated", item.getNameObject());
-                intent.putExtras(bundle);
+                intent.putExtra(Text.class.getName() , item.getDescription());
+                intent.putExtra(Text.TARGET , Item.COLUMN_DESCRIPTION);
 
-                startActivityForResult(intent, 0);
+                activity.startActivityForResult(intent, 0);
             }
         });
-        */
+
+        // Setup types..
+        types = DBType.list(connection);
+        ArrayAdapter<Type> adapter = new ArrayAdapter<Type>(this, android.R.layout.simple_spinner_item, types);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        type.setAdapter(adapter);
+
+        type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                item.setType( types.get(position) );
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        if( types.size() < 1 ) {
+            // FAULT! type size must be more than 0.
+            Common.toastLong(this, "Define some types first!");
+            throw new RuntimeException("Missing types, need atleast 1 type to be specified before creating items.");
+        }
+
+        if( item.getType() == null ) {
+            item.setType( types.get(0) );
+        }
+
+        refresh();
+    }
+
+    private void setupType( Type type ) {
+        for( int i = 0 ; i < types.size() ; ++i ) {
+            if( types.get(i).getId() == type.getId() ) {
+                this.type.setSelection( i );
+                break;
+            }
+        }
+    }
+
+    public void refresh()
+    {
+        Text description = item.getDescription();
+
+        code.setText(item.getCode());
+        if( description != null ) {
+            this.description.setText(description.toString());
+        }
+        setupType(item.getType());
+
+        volume.setText( item.getVolume() );
+        link.setText( item.getLink() );
+        picture.setText(item.getPicture());
+        location.setText(item.getLocation());
     }
 
     @Override
@@ -108,17 +148,25 @@ public class ItemEditActivity extends Activity {
 
     public void save()
     {
-        /*
         try {
-            item.setId(itemId.getText().toString());
-            item.setLocation(itemLocation.getText().toString());
-            item.setType(itemType.getText().toString());
+            item.setCode(code.getText().toString());
+            item.setVolume(volume.getText().toString());
+            item.setLink(link.getText().toString());
+            item.setPicture(picture.getText().toString());
+            item.setLocation(location.getText().toString());
 
-            datasource.save(item);
+
+            Intent intent = new Intent();
+
+            intent.putExtra(Item.class.getName(), item);
+            intent.setAction(Item.EDIT_ACTION);
+
+            setResult(Activity.RESULT_OK, intent);
+
+            finish();
         } catch (Exception e) {
             Common.toastLong(this, "Failed to save item.: " + e.getMessage());
         }
-        */
     }
 
     public void save(View view) {
@@ -152,16 +200,16 @@ public class ItemEditActivity extends Activity {
         // Translation action.
         if(action.equals(Text.EDIT_ACTION)) {
             if (resultCode == RESULT_OK) {
-                Bundle bundle = intent.getExtras();
+                String target = intent.getStringExtra(Text.TARGET);
+                Text text = (Text)intent.getParcelableExtra( Text.class.getName() );
 
-                String target = bundle.getParcelable(Text.TARGET);
-                Text text = bundle.getParcelable(Text.class.getName());
+                if( target == null ) {
+                    return;
+                }
 
-                if( text != null ) {
-                    /*
-                    item.setName(translated);
-                    itemName.setText( item.getName() );
-                    */
+                if( target.equals(Item.COLUMN_DESCRIPTION) ) {
+                    item.setDescription(text);
+                    description.setText(item.getDescription().toString());
                 }
             }
         }

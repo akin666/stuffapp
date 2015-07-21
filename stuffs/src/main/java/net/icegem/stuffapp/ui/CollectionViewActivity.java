@@ -17,6 +17,7 @@ import net.icegem.stuffapp.Barcode;
 import net.icegem.stuffapp.R;
 import net.icegem.stuffapp.data.Collection;
 import net.icegem.stuffapp.data.Item;
+import net.icegem.stuffapp.database.DBCollection;
 import net.icegem.stuffapp.database.DBConnection;
 import net.icegem.stuffapp.database.DBItem;
 
@@ -167,6 +168,41 @@ public class CollectionViewActivity extends AppCompatActivity implements SearchV
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        Barcode.onActivityResult(requestCode, resultCode, intent);
+        if( Barcode.onActivityResult(requestCode, resultCode, intent) ) {
+            return;
+        }
+
+        if( intent == null ) {
+            return;
+        }
+
+        String action = intent.getAction();
+        if( action == null ) {
+            return;
+        }
+
+        // Collection action.
+        if(action.equals(Collection.EDIT_ACTION)) {
+            if (resultCode == RESULT_OK) {
+                Collection collection = (Collection)intent.getParcelableExtra( Collection.class.getName() );
+
+                if( collection != null ) {
+                    DBCollection.save(connection, collection);
+                    refresh();
+                }
+            }
+        }
+
+        // Item action.
+        if(action.equals(Item.EDIT_ACTION)) {
+            if (resultCode == RESULT_OK) {
+                Item item = (Item)intent.getParcelableExtra( Item.class.getName() );
+
+                if( item != null ) {
+                    DBItem.save(connection, item);
+                    refresh();
+                }
+            }
+        }
     }
 }

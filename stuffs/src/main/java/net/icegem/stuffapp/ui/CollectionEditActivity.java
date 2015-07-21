@@ -148,6 +148,10 @@ public class CollectionEditActivity extends AppCompatActivity {
                 String target = intent.getStringExtra(Text.TARGET);
                 Text text = (Text)intent.getParcelableExtra( Text.class.getName() );
 
+                if( target == null ) {
+                    return;
+                }
+
                 if( target.equals(Collection.COLUMN_NAME) ) {
                     collection.setName(text);
                     name.setText(collection.getName().toString());
