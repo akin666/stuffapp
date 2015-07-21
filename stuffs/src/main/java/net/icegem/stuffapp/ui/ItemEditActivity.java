@@ -32,7 +32,9 @@ public class ItemEditActivity extends Activity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        item = bundle.getParcelable(Item.class.getName());
+        if( bundle != null ) {
+            item = bundle.getParcelable(Item.class.getName());
+        }
 
         if( item == null ) {
             item = new Item();
@@ -48,6 +50,7 @@ public class ItemEditActivity extends Activity {
 
     public void refresh()
     {
+
         itemId.setText( item.getId() );
         itemLocation.setText( item.getLocation() );
         itemName.setText(item.getVolume());

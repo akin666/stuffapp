@@ -57,4 +57,5 @@
     <string name="link">Link</string>
     <string name="action_cancel">Cancelled action</string>
     <string name="action_save_collection">Saving collection</string>
+    <string name="new_collection">New collection</string>
 </resources>
