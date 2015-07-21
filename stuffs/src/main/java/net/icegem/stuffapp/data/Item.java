@@ -16,6 +16,10 @@ import java.util.Comparator;
  * Created by mikael.korpela on 12.5.2015.
  */
 public class Item implements Parcelable, Jasonable {
+    // Actions
+    public static final String EDIT_ACTION = "Item_Edit_Action";
+
+    // DB Strings
     public static final String COLUMN_IDENTIFIER = "_id";
     public static final String COLUMN_COLLECTION = "collection";
     public static final String COLUMN_DESCRIPTION = "description";
