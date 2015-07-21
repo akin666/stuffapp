@@ -6,7 +6,7 @@
 
     <item
         android:id="@+id/action_new"
-        android:title="@string/new_collection"
+        android:title="@string/new_item"
         android:orderInCategory="20"
         app:showAsAction="ifRoom" />
 

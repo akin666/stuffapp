@@ -25,10 +25,12 @@ public class TextEditActivity extends Activity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        text = bundle.getParcelable(Text.class.getName());
-        target = bundle.getString(Text.TARGET);
-        extra = bundle.getParcelable(Text.EXTRA);
-
+        if( bundle != null ) {
+            text = bundle.getParcelable(Text.class.getName());
+            target = bundle.getString(Text.TARGET);
+            extra = bundle.getParcelable(Text.EXTRA);
+        }
+        
         if( text == null ) {
             text = new Text();
         }
