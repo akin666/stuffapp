@@ -40,8 +40,8 @@ public class Collection implements Parcelable, Jasonable {
     private static int nid = 10;
 
     private int _id;
-    private Text name = new Text();
-    private Text description = new Text();
+    private Text name = new Text();;
+    private Text description = new Text();;
     private String picture;
     private String link;
 

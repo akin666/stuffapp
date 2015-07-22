@@ -42,7 +42,7 @@ public class CollectionEditActivity extends AppCompatActivity {
 
         name = (EditText)findViewById(R.id.name);
         description = (EditText)findViewById(R.id.description);
-        picture = (EditText)findViewById(R.id.picture);
+        //picture = (EditText)findViewById(R.id.picture);
         link = (EditText)findViewById(R.id.name);
 
         final Collection collection = this.collection;
@@ -76,7 +76,7 @@ public class CollectionEditActivity extends AppCompatActivity {
     public void refresh() {
         name.setText(collection.getName().toString());
         description.setText(collection.getDescription().toString());
-        picture.setText(collection.getPicture());
+        //picture.setText(collection.getPicture());
         link.setText(collection.getLink());
     }
 
@@ -102,8 +102,8 @@ public class CollectionEditActivity extends AppCompatActivity {
 
     public void save() {
         // From ui..
-        collection.setPicture( picture.getText().toString() );
-        collection.setLink( picture.getText().toString() );
+        //collection.setPicture( picture.getText().toString() );
+        collection.setLink( link.getText().toString() );
 
         Intent intent = new Intent();
 

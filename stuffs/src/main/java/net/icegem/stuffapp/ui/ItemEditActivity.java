@@ -2,14 +2,18 @@ package net.icegem.stuffapp.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.icegem.stuffapp.Barcode;
+import net.icegem.stuffapp.Helpers;
 import net.icegem.stuffapp.R;
 import net.icegem.stuffapp.data.Item;
 import net.icegem.stuffapp.data.Text;
@@ -31,8 +35,10 @@ public class ItemEditActivity extends Activity {
     Spinner type = null;
     TextView volume = null;
     TextView link = null;
-    TextView picture = null;
+    ImageView picture = null;
     TextView location = null;
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +63,7 @@ public class ItemEditActivity extends Activity {
         type = (Spinner)findViewById(R.id.type);
         volume = (TextView)findViewById(R.id.volume);
         link = (TextView)findViewById(R.id.link);
-        picture = (TextView)findViewById(R.id.picture);
+        picture = (ImageView)findViewById(R.id.picture);
         location = (TextView)findViewById(R.id.location);
 
         // Add click listener, so that we can edit the Text object in a different way..
@@ -72,6 +78,17 @@ public class ItemEditActivity extends Activity {
                 intent.putExtra(Text.TARGET , Item.COLUMN_DESCRIPTION);
 
                 activity.startActivityForResult(intent, 0);
+            }
+        });
+
+        // Picture click
+        picture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                }
             }
         });
 
@@ -95,7 +112,7 @@ public class ItemEditActivity extends Activity {
         if( types.size() < 1 ) {
             // FAULT! type size must be more than 0.
             Common.toastLong(this, "Define some types first!");
-            throw new RuntimeException("Missing types, need atleast 1 type to be specified before creating items.");
+S            throw new RuntimeException("Missing types, need atleast 1 type to be specified before creating items.");
         }
 
         if( item.getType() == null ) {
@@ -114,6 +131,16 @@ public class ItemEditActivity extends Activity {
         }
     }
 
+    private void setupPicture( String data ) {
+        Bitmap bitmap = Helpers.toBitMap( data );
+
+        if( bitmap == null ) {
+            bitmap = Helpers.emptyBitMap( getString( R.string.no_image ) , 100 , 100 );
+        }
+
+        picture.setImageBitmap(bitmap);
+    }
+
     public void refresh()
     {
         Text description = item.getDescription();
@@ -124,9 +151,9 @@ public class ItemEditActivity extends Activity {
         }
         setupType(item.getType());
 
-        volume.setText( item.getVolume() );
+        volume.setText(item.getVolume());
         link.setText( item.getLink() );
-        picture.setText(item.getPicture());
+        setupPicture(item.getPicture());
         location.setText(item.getLocation());
     }
 
@@ -152,7 +179,7 @@ public class ItemEditActivity extends Activity {
             item.setCode(code.getText().toString());
             item.setVolume(volume.getText().toString());
             item.setLink(link.getText().toString());
-            item.setPicture(picture.getText().toString());
+            //item.setPicture(picture.getText().toString());
             item.setLocation(location.getText().toString());
 
 
@@ -212,6 +239,15 @@ public class ItemEditActivity extends Activity {
                     description.setText(item.getDescription().toString());
                 }
             }
+        }
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = intent.getExtras();
+            Bitmap bitmap = (Bitmap)extras.get("data");
+            picture.setImageBitmap(bitmap);
+
+            String str = Helpers.toString(bitmap);
+            item.setPicture(str);
         }
     }
 
