@@ -130,7 +130,7 @@ public class CollectionViewActivity extends AppCompatActivity implements SearchV
             }
             case R.id.action_new : {
                 Intent intent = new Intent(this, ItemEditActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
                 return true;
             }
             case R.id.action_about : {
@@ -199,6 +199,9 @@ public class CollectionViewActivity extends AppCompatActivity implements SearchV
                 Item item = (Item)intent.getParcelableExtra( Item.class.getName() );
 
                 if( item != null ) {
+                    // its a new item, we have to set the collection..
+                    item.setCollection( collection );
+
                     DBItem.save(connection, item);
                     refresh();
                 }
