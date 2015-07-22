@@ -3,6 +3,7 @@ package net.icegem.stuffapp;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Base64;
@@ -74,10 +75,26 @@ public class Helpers {
         textColor.setTextSize( textSize );
 
         canvas.drawCircle(w / 2 , h / 2 , min / 2.0f , white );
-        canvas.drawText(str, textLeft, h / 2.0f + ( textSize / 2 ) , textColor);
+        canvas.drawText(str, textLeft, h / 2.0f + (textSize / 2), textColor);
 
         canvas.save();
 
         return bitmap;
+    }
+
+    public static Bitmap resizeBitmap(Bitmap bitmap, int maxWidth, int maxHeight) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        float scaleW = ((float)maxWidth) / width;
+        float scaleH = ((float)maxHeight) / height;
+
+        float scale = scaleH < scaleW ? scaleH : scaleW;
+        Matrix matrix = new Matrix();
+
+        // Resize
+        matrix.postScale(scale, scale);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, false);
     }
 }
