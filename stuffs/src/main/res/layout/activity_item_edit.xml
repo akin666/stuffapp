@@ -12,6 +12,45 @@
         android:orientation="vertical"
         android:layout_margin="5dp">
 
+
+        <!-- Volume -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:text="@string/volume"
+                android:id="@+id/volume_header"
+                />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:id="@+id/volume" />
+        </LinearLayout>
+
+        <!-- Type -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:text="@string/type"
+                android:id="@+id/type_header"
+                />
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/type"
+                />
+        </LinearLayout>
+
         <!-- Code -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,44 +88,6 @@
                 android:id="@+id/description" />
         </LinearLayout>
 
-        <!-- Type -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="@string/type"
-                android:id="@+id/type_header"
-                />
-
-            <Spinner
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/type"
-                />
-        </LinearLayout>
-
-        <!-- Volume -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="@string/volume"
-                android:id="@+id/volume_header"
-                />
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:id="@+id/volume" />
-        </LinearLayout>
-
         <!-- Link -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -106,25 +107,6 @@
                 android:id="@+id/link" />
         </LinearLayout>
 
-        <!-- Picture -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="@string/picture"
-                android:id="@+id/picture_header"
-                />
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:id="@+id/picture" />
-        </LinearLayout>
-
         <!-- Location -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -142,6 +124,29 @@
                 android:id="@+id/location"
                 />
         </LinearLayout>
+
+        <!-- Picture -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:text="@string/picture"
+                android:id="@+id/picture_header"
+                />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="100dp"
+                android:minWidth="50dp"
+                android:inputType="none"
+                android:id="@+id/picture" />
+        </LinearLayout>
+
+
 
     </LinearLayout>
 
