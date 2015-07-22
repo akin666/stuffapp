@@ -1,8 +1,10 @@
 package net.icegem.stuffapp.ui;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -57,6 +59,9 @@ public class CollectionViewActivity extends AppCompatActivity implements SearchV
         }
 
         try {
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setTitle(collection.getName().toString());
+
             List<Item> values = DBItem.listByCollection(connection, collection.getId());
             ListAdapter adapter = new UIITem.RowAdapter(this, values);
             list.setAdapter(adapter);
@@ -133,6 +138,30 @@ public class CollectionViewActivity extends AppCompatActivity implements SearchV
                 startActivityForResult(intent, 0);
                 return true;
             }
+            case R.id.action_edit : {
+                Intent intent = new Intent(this, CollectionEditActivity.class);
+                intent.putExtra(Collection.class.getName() , collection);
+                startActivityForResult(intent, 0);
+                return true;
+            }
+            case R.id.action_delete :
+            {
+                Common.toast(this, "delete requested");
+
+                Common.question(
+                        this,
+                        getString(R.string.delete),
+                        getString(R.string.delete_collection_sure),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                DBCollection.delete(connection, collection);
+                                finish();
+                            }
+                        },
+                        null);
+
+                return true;
+            }
             case R.id.action_about : {
                 Intent intent = new Intent(this, AboutActivity.class);
                 startActivity(intent);
@@ -181,13 +210,14 @@ public class CollectionViewActivity extends AppCompatActivity implements SearchV
             return;
         }
 
-        // Collection action.
+        // Collection edit action.
         if(action.equals(Collection.EDIT_ACTION)) {
             if (resultCode == RESULT_OK) {
                 Collection collection = (Collection)intent.getParcelableExtra( Collection.class.getName() );
 
                 if( collection != null ) {
                     DBCollection.save(connection, collection);
+                    this.collection = collection;
                     refresh();
                 }
             }

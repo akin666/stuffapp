@@ -26,6 +26,7 @@
     <string name="edit_item">Edit item</string>
     <string name="name">Name</string>
     <string name="delete_item_sure">Are you sure you want to delete the item?</string>
+    <string name="delete_collection_sure">Are you sure you want to delete the collection?</string>
     <string name="type">Type</string>
     <string name="search">Search</string>
     <string name="title_activity_about">AboutActivity</string>

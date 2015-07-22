@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +16,8 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import net.icegem.stuffapp.Barcode;
+import net.icegem.stuffapp.data.Collection;
 import net.icegem.stuffapp.data.Item;
 import net.icegem.stuffapp.R;
 import net.icegem.stuffapp.Settings;
@@ -61,6 +64,12 @@ public class ItemViewActivity extends AppCompatActivity {
         if (item == null) {
             Common.toast(this, "Item does not exist.");
             return;
+        }
+
+        Collection collection = item.getCollection();
+        if( collection != null ) {
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setTitle(collection.getName().toString());
         }
 
         location.setText(item.getLocation());
@@ -118,7 +127,7 @@ public class ItemViewActivity extends AppCompatActivity {
             {
                 Intent intent = new Intent(this, ItemEditActivity.class);
                 intent.putExtra(Item.class.getName() , item);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
                 return true;
             }
             case R.id.action_delete :
@@ -148,5 +157,33 @@ public class ItemViewActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(menuitem);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if( Barcode.onActivityResult(requestCode, resultCode, intent) ) {
+            return;
+        }
+
+        if( intent == null ) {
+            return;
+        }
+
+        String action = intent.getAction();
+        if( action == null ) {
+            return;
+        }
+
+        // Item action.
+        if(action.equals(Item.EDIT_ACTION)) {
+            if (resultCode == RESULT_OK) {
+                Item item = (Item)intent.getParcelableExtra( Item.class.getName() );
+
+                if( item != null ) {
+                    DBItem.save(connection, item);
+                    this.item = item;
+                    refresh();
+                }
+            }
+        }
     }
 }
