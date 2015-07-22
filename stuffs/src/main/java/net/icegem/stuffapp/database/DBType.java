@@ -131,6 +131,14 @@ public class DBType {
         db.delete(TABLE, Type.COLUMN_IDENTIFIER + " = " + id, null);
     }
 
+    public static void deleteAll(SQLiteDatabase db) {
+        List<Type> items = list(db);
+        for( Type iter : items )
+        {
+            delete(db, iter);
+        }
+    }
+
     public static List<Type> list(SQLiteDatabase db) {
         ArrayList<Type> items = new ArrayList<Type>();
         Cursor cursor = db.query(TABLE, columns, null, null, null, null, null);

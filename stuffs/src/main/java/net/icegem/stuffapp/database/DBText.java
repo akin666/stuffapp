@@ -156,6 +156,11 @@ public class DBText {
         db.delete(TABLE_TRANSLATE , Text.COLUMN_TEXT + " = " + id, null);
     }
 
+    public static void deleteAll(SQLiteDatabase db) {
+        db.delete(TABLE, null, null);
+        db.delete(TABLE_TRANSLATE, null, null);
+    }
+
     public static List<Text> list(SQLiteDatabase db) {
         ArrayList<Text> items = new ArrayList<Text>();
         Cursor cursor = db.query(TABLE, columns, null, null, null, null, null);

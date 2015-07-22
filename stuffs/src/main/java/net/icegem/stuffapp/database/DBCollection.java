@@ -154,6 +154,14 @@ public class DBCollection {
         db.delete(TABLE, Collection.COLUMN_IDENTIFIER + " = " + id, null);
     }
 
+    public static void deleteAll(SQLiteDatabase db) {
+        List<Collection> items = list(db);
+        for( Collection iter : items )
+        {
+            delete(db, iter);
+        }
+    }
+
     public static List<Collection> list(SQLiteDatabase db) {
         ArrayList<Collection> items = new ArrayList<Collection>();
         Cursor cursor = db.query(TABLE, columns, null, null, null, null, null);
