@@ -57,7 +57,7 @@ public class Item implements Parcelable, Jasonable {
 
     private int _id = 0;
     private Collection collection;
-    private Text description;
+    private Text description = new Text();
     private Type type;
     private String code;
     private String link;

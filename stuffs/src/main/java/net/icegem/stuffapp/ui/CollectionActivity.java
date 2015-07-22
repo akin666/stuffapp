@@ -39,12 +39,12 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
         list = (ListView) findViewById(R.id.list);
         search = (SearchView) findViewById(R.id.search);
 
-        manager = new UICollection.Manager(this, connection);
-
         refresh();
     }
 
     private void refresh() {
+        manager = new UICollection.Manager(this, connection);
+
         try {
             list.setAdapter(manager);
             final Activity parentActivity = this;
