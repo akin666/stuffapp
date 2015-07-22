@@ -120,6 +120,8 @@ public class DBType {
     public static void delete(SQLiteDatabase db , Type item) {
         int id = item.getId();
 
+        DBText.delete(db, item.getName());
+
         // NEW!
         if( id < 0 )
         {

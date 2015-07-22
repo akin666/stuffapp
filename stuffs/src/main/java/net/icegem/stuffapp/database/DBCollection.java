@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import net.icegem.stuffapp.data.Collection;
+import net.icegem.stuffapp.data.Item;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,7 +127,7 @@ public class DBCollection {
             item.setId(id);
         }
         else {
-            db.update(TABLE, values, Collection.COLUMN_IDENTIFIER + " = " + id,  null);
+            db.update(TABLE, values, Collection.COLUMN_IDENTIFIER + " = " + id, null);
         }
 
         return item;
@@ -134,6 +135,15 @@ public class DBCollection {
 
     public static void delete(SQLiteDatabase db , Collection item) {
         int id = item.getId();
+
+        DBText.delete(db, item.getName());
+        DBText.delete(db, item.getDescription());
+
+        List<Item> items = DBItem.listByCollection(db , id);
+        for( Item iter : items )
+        {
+            DBItem.delete(db, iter);
+        }
 
         // NEW!
         if( id < 0 )
