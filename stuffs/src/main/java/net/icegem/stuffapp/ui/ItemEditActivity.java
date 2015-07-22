@@ -88,6 +88,7 @@ public class ItemEditActivity extends Activity {
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                    saveState();
                 }
             }
         });
@@ -112,7 +113,7 @@ public class ItemEditActivity extends Activity {
         if( types.size() < 1 ) {
             // FAULT! type size must be more than 0.
             Common.toastLong(this, "Define some types first!");
-S            throw new RuntimeException("Missing types, need atleast 1 type to be specified before creating items.");
+            throw new RuntimeException("Missing types, need atleast 1 type to be specified before creating items.");
         }
 
         if( item.getType() == null ) {
@@ -132,10 +133,13 @@ S            throw new RuntimeException("Missing types, need atleast 1 type to b
     }
 
     private void setupPicture( String data ) {
-        Bitmap bitmap = Helpers.toBitMap( data );
+        Bitmap bitmap = Helpers.toBitMap(data);
 
         if( bitmap == null ) {
             bitmap = Helpers.emptyBitMap( getString( R.string.no_image ) , 100 , 100 );
+        }
+        else {
+            Common.log("The image is of size: " + bitmap.getWidth() + "x" + bitmap.getHeight() );
         }
 
         picture.setImageBitmap(bitmap);
@@ -210,6 +214,10 @@ S            throw new RuntimeException("Missing types, need atleast 1 type to b
         finish();
     }
 
+    public void saveState() {
+        getIntent().putExtra(Item.class.getName(), item);
+    }
+
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if( Barcode.onActivityResult(requestCode, resultCode, intent) ) {
             return;
@@ -239,15 +247,24 @@ S            throw new RuntimeException("Missing types, need atleast 1 type to b
                     description.setText(item.getDescription().toString());
                 }
             }
+            return;
         }
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = intent.getExtras();
             Bitmap bitmap = (Bitmap)extras.get("data");
-            picture.setImageBitmap(bitmap);
+
+            if( bitmap == null ) {
+                return;
+            }
+
+            bitmap = Helpers.resizeBitmap( bitmap , 100 , 100 );
 
             String str = Helpers.toString(bitmap);
             item.setPicture(str);
+
+            saveState();
+            return;
         }
     }
 
