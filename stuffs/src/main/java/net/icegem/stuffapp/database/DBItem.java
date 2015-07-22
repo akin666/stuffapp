@@ -166,6 +166,8 @@ public class DBItem {
     public static void delete(SQLiteDatabase db , Item item) {
         int id = item.getId();
 
+        DBText.delete(db, item.getDescription());
+
         // NEW!
         if( id < 0 )
         {
