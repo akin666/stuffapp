@@ -177,6 +177,14 @@ public class DBItem {
         db.delete(TABLE, Item.COLUMN_IDENTIFIER + " = " + id, null);
     }
 
+    public static void deleteAll(SQLiteDatabase db) {
+        List<Item> items = list(db);
+        for( Item iter : items )
+        {
+            delete(db, iter);
+        }
+    }
+
     public static List<Item> list(SQLiteDatabase db) {
         ArrayList<Item> items = new ArrayList<Item>();
 
