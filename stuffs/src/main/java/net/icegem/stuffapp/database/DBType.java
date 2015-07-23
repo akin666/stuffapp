@@ -80,6 +80,19 @@ public class DBType {
         }
     }
 
+    public static int count(DBConnection connection) {
+        SQLiteDatabase db = null;
+        try {
+            db = connection.getReadAccess();
+            return count(db);
+        }
+        finally {
+            if( db != null ) {
+                db.close();
+            }
+        }
+    }
+
     public static Type get(SQLiteDatabase db , int id) {
         Type item = new Type(id);
 
@@ -153,6 +166,12 @@ public class DBType {
             cursor.moveToNext();
         }
         return items;
+    }
+
+    public static int count(SQLiteDatabase db) {
+        ArrayList<Type> items = new ArrayList<Type>();
+        Cursor cursor = db.query(TABLE, columns, null, null, null, null, null);
+        return cursor.getCount();
     }
 
     /// DB Management
