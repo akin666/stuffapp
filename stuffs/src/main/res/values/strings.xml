@@ -64,6 +64,7 @@
     <string name="volume">Volume</string>
     <string name="no_image">No image.</string>
     <string name="dismiss">Dismiss</string>
+    <string name="define_some_types">Define some item types first!</string>
 
     <color name="white">#FFFFFF</color>
     <color name="grey">#444444</color>

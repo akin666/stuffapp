@@ -13,6 +13,8 @@ import org.json.JSONObject;
  * Created by mikael.korpela on 27.5.2015.
  */
 public class Type implements Parcelable, Jasonable {
+    public static final String PLURAL = "Types";
+
     // Actions
     public static final String EDIT_ACTION = "Type_Edit_Action";
     public static final String VIEW_ACTION = "Type_View_Action";
@@ -43,6 +45,10 @@ public class Type implements Parcelable, Jasonable {
         return _id;
     }
 
+    public void resetId() {
+        _id = -(++nid);
+    }
+
     public void setId( int id ) {
         _id = id;
     }
@@ -62,6 +68,10 @@ public class Type implements Parcelable, Jasonable {
 
     public int compareTo(Type other) {
         return name.compareTo(other.name);
+    }
+
+    public boolean equals(Type other) {
+        return name.equals(other.getName());
     }
 
     //// Parcelable
