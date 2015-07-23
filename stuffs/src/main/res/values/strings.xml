@@ -50,6 +50,7 @@
     <string name="language_header">Language</string>
     <string name="database_header">Database</string>
     <string name="edit_types">Edit types</string>
+    <string name="edit_languages">Edit languages</string>
     <string name="types_add">Add type</string>
     <string name="type_remove_topic">Remove type?</string>
     <string name="type_remove_message">Do you want to remove the type?</string>
@@ -62,6 +63,7 @@
     <string name="code">Code</string>
     <string name="volume">Volume</string>
     <string name="no_image">No image.</string>
+    <string name="dismiss">Dismiss</string>
 
     <color name="white">#FFFFFF</color>
     <color name="grey">#444444</color>

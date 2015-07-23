@@ -1,6 +1,7 @@
 package net.icegem.stuffapp.ui;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -50,6 +51,10 @@ public class TextEditActivity extends Activity {
         }
     }
 
+    public void add(View view) {
+        adapter.add();
+    }
+
     public void save() {
         Intent intent = new Intent();
 
@@ -60,27 +65,23 @@ public class TextEditActivity extends Activity {
         if( extra != null ) {
             intent.putExtra(Text.EXTRA, extra);
         }
-        intent.setAction( Text.EDIT_ACTION );
+        intent.setAction(Text.EDIT_ACTION);
 
-        setResult(Activity.RESULT_OK, intent);
-        finish();
+        // http://stackoverflow.com/questions/2497205/how-to-return-a-result-startactivityforresult-from-a-tabhost-activity
+        if (getParent() == null) {
+            setResult(Activity.RESULT_OK, intent);
+        } else {
+            getParent().setResult(Activity.RESULT_OK, intent);
+        }
     }
 
-    public void add(View view) {
-        adapter.add();
-    }
-
-    public void save(View view) {
-        Common.toastLong(this, getString(R.string.save_translation_edit));
-
+    @Override
+    public void finish() {
         save();
-
-        finish();
+        super.finish();
     }
 
-    public void cancel(View view) {
-        Common.toastLong(this, getString(R.string.action_cancel));
-
+    public void dismiss(View view) {
         finish();
     }
 }

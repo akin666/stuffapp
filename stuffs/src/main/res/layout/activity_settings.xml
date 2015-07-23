@@ -68,6 +68,7 @@
                 android:id="@+id/DB_clear" />
         </LinearLayout>
 
+        <!--
         <LinearLayout
             android:orientation="vertical"
             android:paddingTop="20dp"
@@ -79,9 +80,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/language_header"
-                android:id="@+id/textView2"
-                android:enabled="false" />
+                android:text="@string/language_header" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -90,48 +89,40 @@
                 android:text="en"
                 android:id="@+id/textView4"
                 android:editable="false" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:text="@string/edit_languages"
+                android:onClick="editLanguages"
+                android:id="@+id/edit_languages" />
         </LinearLayout>
+        -->
 
         <LinearLayout
             android:orientation="vertical"
             android:paddingTop="20dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
             <TextView
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/types_header"
-                android:id="@+id/textView5"
-                android:enabled="true" />
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:id="@+id/list" />
+                android:text="@string/types_header" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
-                android:text="@string/types_add"
-                android:onClick="addType"
-                android:id="@+id/addType" />
+                android:text="@string/edit_types"
+                android:onClick="editTypes"
+                android:id="@+id/edit_types" />
         </LinearLayout>
-
-        <!--
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Change language"
-                android:onClick="languageChange"
-                android:id="@+id/language_change"
-                android:enabled="false" />
-            -->
 
     </LinearLayout>
 </ScrollView>

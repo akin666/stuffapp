@@ -31,20 +31,10 @@
             android:layout_width="wrap_content"
             android:minWidth="80dp"
             android:layout_height="wrap_content"
-            android:id="@+id/id_save"
-            android:text="@string/save"
-            android:layout_toStartOf="@+id/id_cancel"
-            android:onClick="save"
-            style="@style/Base.Widget.AppCompat.Button.Small" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:minWidth="80dp"
-            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:id="@+id/id_cancel"
-            android:text="@string/cancel"
-            android:onClick="cancel"
+            android:id="@+id/id_dismiss"
+            android:text="@string/dismiss"
+            android:onClick="dismiss"
             style="@style/Base.Widget.AppCompat.Button.Small" />
     </RelativeLayout>
 
