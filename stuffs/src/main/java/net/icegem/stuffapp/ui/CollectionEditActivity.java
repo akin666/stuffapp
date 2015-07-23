@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import net.icegem.stuffapp.Barcode;
@@ -24,7 +25,7 @@ public class CollectionEditActivity extends AppCompatActivity {
 
     private EditText name;
     private EditText description;
-    private EditText picture;
+    private ImageView picture;
     private EditText link;
 
     @Override
@@ -42,7 +43,7 @@ public class CollectionEditActivity extends AppCompatActivity {
 
         name = (EditText)findViewById(R.id.name);
         description = (EditText)findViewById(R.id.description);
-        //picture = (EditText)findViewById(R.id.picture);
+        picture = (ImageView)findViewById(R.id.picture);
         link = (EditText)findViewById(R.id.name);
 
         final Collection collection = this.collection;
@@ -67,6 +68,18 @@ public class CollectionEditActivity extends AppCompatActivity {
                 intent.putExtra(Text.TARGET , Collection.COLUMN_DESCRIPTION);
 
                 activity.startActivityForResult(intent, 0);
+            }
+        });
+
+        // Picture click
+        picture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent takePictureIntent = new Intent(activity, ImageActivity.class);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takePictureIntent, 0);
+                    //saveState();
+                }
             }
         });
 
@@ -160,6 +173,12 @@ public class CollectionEditActivity extends AppCompatActivity {
                     collection.setDescription(text);
                     description.setText(collection.getDescription().toString());
                 }
+            }
+        }
+
+        // Image action.
+        if(action.equals(ImageActivity.ACTION)) {
+            if (resultCode == RESULT_OK) {
             }
         }
     }
