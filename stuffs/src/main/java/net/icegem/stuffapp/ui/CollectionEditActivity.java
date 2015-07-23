@@ -75,11 +75,10 @@ public class CollectionEditActivity extends AppCompatActivity {
         picture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent takePictureIntent = new Intent(activity, ImageActivity.class);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, 0);
-                    //saveState();
-                }
+                Intent intent = new Intent(activity, ImageActivity.class);
+                intent.putExtra("width" , 1080 );
+                startActivityForResult(intent, 0);
+                //saveState();
             }
         });
 
