@@ -16,6 +16,8 @@ import java.util.Comparator;
  * Created by mikael.korpela on 12.5.2015.
  */
 public class Item implements Parcelable, Jasonable {
+    public static final String PLURAL = "Items";
+
     // Actions
     public static final String EDIT_ACTION = "Item_Edit_Action";
 
@@ -83,6 +85,10 @@ public class Item implements Parcelable, Jasonable {
 
     public void setId( int id ) {
         _id = id;
+    }
+
+    public void resetId() {
+        _id = -(++nid);
     }
 
     public Text getDescription() {
@@ -180,6 +186,13 @@ public class Item implements Parcelable, Jasonable {
         return volume.compareTo(other.volume);
     }
 
+    public boolean equals(Item other) {
+        if( collection.getId() != other.getCollection().getId() ) {
+            return false;
+        }
+        return volume.equals(other.getVolume());
+    }
+
     //// Parcelable
     @Override
     public int describeContents() {
@@ -247,10 +260,20 @@ public class Item implements Parcelable, Jasonable {
         collection = new Collection(json.getInt(COLUMN_COLLECTION));
         description = new Text(json.getJSONObject(COLUMN_DESCRIPTION));
         type = new Type(json.getInt(COLUMN_TYPE));
-        code = json.getString(COLUMN_CODE);
-        link = json.getString(COLUMN_LINK);
-        volume = json.getString(COLUMN_VOLUME);
-        picture = json.getString(COLUMN_PICTURE);
-        location = json.getString(COLUMN_LOCATION);
+        try {
+            code = json.getString(COLUMN_CODE);
+        } catch( Exception e ) {}
+        try {
+            link = json.getString(COLUMN_LINK);
+        } catch( Exception e ) {}
+        try {
+            volume = json.getString(COLUMN_VOLUME);
+        } catch( Exception e ) {}
+        try {
+            picture = json.getString(COLUMN_PICTURE);
+        } catch( Exception e ) {}
+        try {
+            location = json.getString(COLUMN_LOCATION);
+        } catch( Exception e ) {}
     }
 }

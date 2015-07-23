@@ -18,6 +18,8 @@ import java.util.Iterator;
  * Created by mikael.korpela on 25.5.2015.
  */
 public class Collection implements Parcelable, Jasonable {
+    public static final String PLURAL = "Collections";
+
     // Actions
     public static final String EDIT_ACTION = "Collection_Edit_Action";
 
@@ -40,8 +42,8 @@ public class Collection implements Parcelable, Jasonable {
     private static int nid = 10;
 
     private int _id;
-    private Text name = new Text();;
-    private Text description = new Text();;
+    private Text name = new Text();
+    private Text description = new Text();
     private String picture;
     private String link;
 
@@ -63,6 +65,10 @@ public class Collection implements Parcelable, Jasonable {
 
     public void setId( int id ) {
         _id = id;
+    }
+
+    public void resetId() {
+        _id = -(++nid);
     }
 
     public Text getName()
@@ -112,6 +118,10 @@ public class Collection implements Parcelable, Jasonable {
 
     public int compareTo(Collection other) {
         return name.compareTo(other.name);
+    }
+
+    public boolean equals(Collection other) {
+        return name.equals(other.getName());
     }
 
     //// Parcelable
@@ -167,7 +177,11 @@ public class Collection implements Parcelable, Jasonable {
         _id = json.getInt(COLUMN_IDENTIFIER);
         name = new Text(json.getJSONObject(COLUMN_NAME));
         description = new Text(json.getJSONObject(COLUMN_DESCRIPTION));
-        picture = json.getString(COLUMN_PICTURE);
-        link = json.getString(COLUMN_LINK);
+        try {
+            picture = json.getString(COLUMN_PICTURE);
+        } catch( Exception e ) {}
+        try {
+            link = json.getString(COLUMN_LINK);
+        } catch( Exception e ) {}
     }
 }

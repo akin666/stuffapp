@@ -112,11 +112,12 @@ public class ItemEditActivity extends Activity {
 
         if( types.size() < 1 ) {
             // FAULT! type size must be more than 0.
-            Common.toastLong(this, "Define some types first!");
+            Common.toastLong(this, getString(R.string.define_some_types));
 
             Intent intent2 = new Intent(activity, TypeEditActivity.class);
             activity.startActivity(intent2);
             finish();
+
             return;
         }
 

@@ -21,6 +21,7 @@ import java.util.Vector;
  * Created by mikael.korpela on 25.5.2015.
  */
 public class Text implements Parcelable, Jasonable {
+    public static final String PLURAL = "Texts";
 
     // Actions
     public static final String EDIT_ACTION = "Text_Edit_Action";
@@ -59,6 +60,10 @@ public class Text implements Parcelable, Jasonable {
 
     public void setId( int id ) {
         _id = id;
+    }
+
+    public void resetId() {
+        _id = -(++nid);
     }
 
     public String get() {
