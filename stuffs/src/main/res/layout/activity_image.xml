@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="net.icegem.stuffapp.ui.ImageActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="200dp"
+        android:inputType="none"
+        android:id="@+id/picture" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_crop"
+            android:text="@string/crop"
+            android:onClick="crop"
+            android:layout_alignParentEnd="false"
+            style="@style/Base.Widget.AppCompat.Button.Small" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_camera"
+            android:text="@string/camera"
+            android:onClick="camera"
+            android:layout_alignParentEnd="false"
+            android:layout_toEndOf="@+id/id_crop"
+            style="@style/Base.Widget.AppCompat.Button.Small" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:minWidth="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/id_dismiss"
+            android:text="@string/dismiss"
+            android:onClick="dismiss"
+            style="@style/Base.Widget.AppCompat.Button.Small" />
+    </RelativeLayout>
+</LinearLayout>
+

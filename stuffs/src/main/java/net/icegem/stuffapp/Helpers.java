@@ -86,15 +86,33 @@ public class Helpers {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 
-        float scaleW = ((float)maxWidth) / width;
-        float scaleH = ((float)maxHeight) / height;
+        if( (maxWidth <= 0) && (maxHeight <= 0) ) {
+            return bitmap;
+        }
 
-        float scale = scaleH < scaleW ? scaleH : scaleW;
+        float scale = 1.0f;
+        if( maxWidth <= 0 ) {
+            scale = ((float)maxHeight) / height;
+        }
+        else if(maxHeight <= 0) {
+            scale = ((float)maxWidth) / width;
+        }
+        else {
+            float scaleW = ((float)maxWidth) / width;
+            float scaleH = ((float)maxHeight) / height;
+
+            scale = scaleH < scaleW ? scaleH : scaleW;
+        }
+
         Matrix matrix = new Matrix();
 
         // Resize
         matrix.postScale(scale, scale);
 
         return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, false);
+    }
+
+    public static Bitmap cropBitmap(Bitmap bitmap, int x, int y, int width, int height) {
+        return  Bitmap.createBitmap(bitmap, x,y,width, height);
     }
 }

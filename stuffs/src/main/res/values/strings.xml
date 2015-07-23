@@ -66,6 +66,9 @@
     <string name="dismiss">Dismiss</string>
     <string name="define_some_types">Define some item types first!</string>
     <string name="import_export_warning">Importing data will reboot the application.</string>
+    <string name="title_activity_image">Image edit</string>
+    <string name="crop">Crop</string>
+    <string name="camera">Take a picture</string>
 
     <color name="warning">#FF0000</color>
     <color name="white">#FFFFFF</color>
