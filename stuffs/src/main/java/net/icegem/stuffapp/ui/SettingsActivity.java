@@ -186,6 +186,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         dbText.setText("");
         Common.toastLong(this, getString(R.string.db_import_success));
+
+        // Reset.
+        Intent intent = new Intent(SettingsActivity.this, CollectionActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     public void exportDB(View view) {
