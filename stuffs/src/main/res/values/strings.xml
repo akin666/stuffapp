@@ -65,7 +65,9 @@
     <string name="no_image">No image.</string>
     <string name="dismiss">Dismiss</string>
     <string name="define_some_types">Define some item types first!</string>
+    <string name="import_export_warning">Importing data will reboot the application.</string>
 
+    <color name="warning">#FF0000</color>
     <color name="white">#FFFFFF</color>
     <color name="grey">#444444</color>
 </resources>
