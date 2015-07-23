@@ -40,7 +40,7 @@ public class ImageActivity extends Activity {
             bitmap = (Bitmap)extras.get("data");
             uri = (Uri)extras.get("uri");
         }
-        
+
         setupPicture();
     }
 
@@ -122,19 +122,29 @@ public class ImageActivity extends Activity {
     private void performCrop() {
         // take care of exceptions
         try {
-            // call the standard crop action intent (the user device may not
-            // support it)
+            // call the standard crop action intent (the user device may not support it)
             Intent cropIntent = new Intent("com.android.camera.action.CROP");
+
+            Intent intent = getIntent();
+            Bundle extras = intent.getExtras();
+
+            if(extras.containsKey("width") ){
+                cropIntent.putExtra("outputX", extras.getInt("width"));
+            }
+            if(extras.containsKey("height") ){
+                cropIntent.putExtra("outputY", extras.getInt("height"));
+            }
+            if(extras.containsKey("aspectX") ){
+                cropIntent.putExtra("aspectX", extras.getFloat("aspectX"));
+            }
+            if(extras.containsKey("aspectY") ){
+                cropIntent.putExtra("aspectY", extras.getFloat("aspectY"));
+            }
+
             // indicate image type and Uri
             cropIntent.setDataAndType(uri, "image/*");
             // set crop properties
             cropIntent.putExtra("crop", "true");
-            // indicate aspect of desired crop
-            cropIntent.putExtra("aspectX", 2);
-            cropIntent.putExtra("aspectY", 1);
-            // indicate output X and Y
-            cropIntent.putExtra("outputX", 256);
-            cropIntent.putExtra("outputY", 256);
             // retrieve data on return
             cropIntent.putExtra("return-data", true);
             // start the activity - we handle returning in onActivityResult
