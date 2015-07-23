@@ -113,7 +113,11 @@ public class ItemEditActivity extends Activity {
         if( types.size() < 1 ) {
             // FAULT! type size must be more than 0.
             Common.toastLong(this, "Define some types first!");
-            throw new RuntimeException("Missing types, need atleast 1 type to be specified before creating items.");
+
+            Intent intent2 = new Intent(activity, TypeEditActivity.class);
+            activity.startActivity(intent2);
+            finish();
+            return;
         }
 
         if( item.getType() == null ) {
