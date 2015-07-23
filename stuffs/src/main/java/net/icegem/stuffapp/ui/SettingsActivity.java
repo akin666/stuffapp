@@ -34,8 +34,6 @@ import java.util.List;
 public class SettingsActivity extends AppCompatActivity {
     private DBConnection connection;
     private TextView dbText = null;
-    private ListView list = null;
-    private UIType.Manager typeManager = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +41,8 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         dbText = (TextView)findViewById(R.id.db_text);
-        list = (ListView) findViewById(R.id.list);
 
         connection = new DBConnection(this);
-
-        typeManager = new UIType.Manager(this,connection);
 
         refresh();
     }
@@ -63,16 +58,6 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void refresh() {
-        if( connection == null || list == null ) {
-            return;
-        }
-
-        try {
-            list.setAdapter(typeManager);
-        }
-        catch(Exception e) {
-            Common.toast(this, e.toString());
-        }
     }
 
     public void importDB(View view) {
@@ -145,47 +130,13 @@ public class SettingsActivity extends AppCompatActivity {
                 null);
     }
 
-    public void languageChange(View view) {
-        Common.toastLong(this, "Language Change not implemented.");
+    public void editLanguages(View view) {
+        Intent intent = new Intent(this, TypeEditActivity.class);
+        this.startActivity(intent);
     }
 
-    public void addType(View view) {
-        typeManager.save(new Type());
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if( Barcode.onActivityResult(requestCode, resultCode, intent) ) {
-            return;
-        }
-
-        if( intent == null ) {
-            return;
-        }
-
-        String action = intent.getAction();
-        if( action == null ) {
-            return;
-        }
-
-        // Translation action.
-        if(action.equals(Text.EDIT_ACTION)) {
-            if (resultCode == RESULT_OK) {
-                String target = intent.getStringExtra(Text.TARGET);
-                Text text = (Text)intent.getParcelableExtra( Text.class.getName() );
-
-                // Save the database item..
-                DBText.save( connection , text );
-                if( target.equals(Type.class.getName()) ) {
-                    Type type = (Type)intent.getParcelableExtra( Text.EXTRA );
-                    if( type != null ) {
-                        type.setName(text);
-                        typeManager.save(type);
-                    }
-                    else {
-                        Common.log("Error, Extra TYPE object was null");
-                    }
-                }
-            }
-        }
+    public void editTypes(View view) {
+        Intent intent = new Intent(this, TypeEditActivity.class);
+        this.startActivity(intent);
     }
 }

@@ -71,10 +71,7 @@
             android:name=".ui.TypeEditActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_type_settings"
-            android:parentActivityName=".ui.CollectionActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.CollectionActivity" /> >
+            android:theme="@android:style/Theme.Dialog" >
         </activity>
     </application>
 
