@@ -70,6 +70,10 @@ public class Type implements Parcelable, Jasonable {
         return name.compareTo(other.name);
     }
 
+    public int compareToIgnoreCase(Type other) {
+        return name.compareToIgnoreCase(other.name);
+    }
+
     public boolean equals(Type other) {
         return name.equals(other.getName());
     }

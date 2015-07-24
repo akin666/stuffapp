@@ -39,21 +39,28 @@ public class Item implements Parcelable, Jasonable {
     public static final Comparator<Item> orderByVolume = new Comparator<Item>() {
         @Override
         public int compare(Item lhs, Item rhs) {
-            return lhs.volume.compareTo(rhs.volume);
+            return lhs.volume.compareToIgnoreCase(rhs.volume);
+        }
+    };
+
+    public static final Comparator<Item> orderByName = new Comparator<Item>() {
+        @Override
+        public int compare(Item lhs, Item rhs) {
+            return lhs.volume.compareToIgnoreCase(rhs.volume);
         }
     };
 
     public static final Comparator<Item> orderByType = new Comparator<Item>() {
         @Override
         public int compare(Item lhs, Item rhs) {
-            return lhs.type.compareTo(rhs.type);
+            return lhs.type.compareToIgnoreCase(rhs.type);
         }
     };
 
     public static final Comparator<Item> orderByCollection = new Comparator<Item>() {
         @Override
         public int compare(Item lhs, Item rhs) {
-            return lhs.collection.compareTo(rhs.collection);
+            return lhs.collection.compareToIgnoreCase(rhs.collection);
         }
     };
 
@@ -211,6 +218,10 @@ public class Item implements Parcelable, Jasonable {
 
     public int compareTo(Item other) {
         return volume.compareTo(other.volume);
+    }
+
+    public int compareToIgnoreCase(Item other) {
+        return volume.compareToIgnoreCase(other.volume);
     }
 
     public boolean equals(Item other) {
