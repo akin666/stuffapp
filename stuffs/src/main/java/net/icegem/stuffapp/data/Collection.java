@@ -136,6 +136,10 @@ public class Collection implements Parcelable, Jasonable {
         return name.compareTo(other.name);
     }
 
+    public int compareToIgnoreCase(Collection other) {
+        return name.compareToIgnoreCase(other.name);
+    }
+
     public boolean equals(Collection other) {
         return name.equals(other.getName());
     }

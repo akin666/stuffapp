@@ -3,3 +3,4 @@ syntax: glob
 .idea/
 build/
 local.properties
+*.iml

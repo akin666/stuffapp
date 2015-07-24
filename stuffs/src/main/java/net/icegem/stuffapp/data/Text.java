@@ -169,6 +169,10 @@ public class Text implements Parcelable, Jasonable {
         return get().compareTo(other.get());
     }
 
+    public int compareToIgnoreCase(Text other) {
+        return get().compareToIgnoreCase(other.get());
+    }
+
     public boolean equals(Text other) {
         // We are assuming that the objects are ordered with the sort() function always.
         final Vector<MutablePair<String, String>> a = this.values;
