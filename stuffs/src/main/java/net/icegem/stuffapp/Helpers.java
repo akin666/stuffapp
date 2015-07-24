@@ -1,14 +1,22 @@
 package net.icegem.stuffapp;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Created by mikael.korpela on 22.7.2015.
@@ -112,7 +120,56 @@ public class Helpers {
         return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, false);
     }
 
+    public static Bitmap loadBitmap( Context context , Uri uri ) {
+        ContentResolver cr = context.getContentResolver();
+        try {
+            return MediaStore.Images.Media.getBitmap( cr , uri );
+        } catch (IOException e) {
+        }
+        return null;
+    }
+
+    public static Uri saveBitmap( Context context , Bitmap bitmap ) {
+        String filename = null;
+        File file = null;
+
+        boolean passed = false;
+        do {
+            filename = createGUID() + ".png";
+            file = new File(context.getExternalFilesDir(null), filename);
+            try {
+                passed = file.createNewFile();
+            }
+            catch (IOException e ) {
+            }
+        } while( !passed );
+
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos);
+            byte[] bitmapdata = bos.toByteArray();
+
+            //write the bytes in file
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
+            // Unable to create file, likely because external storage is
+            // not currently mounted.
+            return null;
+        }
+
+        return Uri.fromFile(file);
+    }
+
     public static Bitmap cropBitmap(Bitmap bitmap, int x, int y, int width, int height) {
         return  Bitmap.createBitmap(bitmap, x,y,width, height);
+    }
+
+    public static String createGUID() {
+        UUID uid = UUID.randomUUID();
+        return uid.toString();
     }
 }

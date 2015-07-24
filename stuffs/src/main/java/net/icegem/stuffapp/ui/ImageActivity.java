@@ -30,7 +30,6 @@ public class ImageActivity extends Activity {
     private Uri uri;
 
     ImageView picture = null;
-    Bitmap bitmap = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,24 +39,14 @@ public class ImageActivity extends Activity {
         picture = (ImageView)findViewById(R.id.picture);
 
         Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-
-        if( extras != null ) {
-            bitmap = (Bitmap)extras.get("data");
-            uri = (Uri)extras.get("uri");
-        }
+        uri = intent.getData();
 
         setupPicture();
     }
 
     public void saveState() {
         Intent intent = getIntent();
-        if( bitmap != null ) {
-            intent.putExtra("data", bitmap);
-        }
-        if( uri != null ) {
-            intent.putExtra("uri", uri);
-        }
+        intent.setData(uri);
     }
 
     @Override
@@ -81,7 +70,7 @@ public class ImageActivity extends Activity {
     }
 
     private void setupPicture() {
-        if( bitmap == null ) {
+        if( uri == null ) {
             int width = 100;
             int height = 100;
 
@@ -92,15 +81,11 @@ public class ImageActivity extends Activity {
                 height = picture.getHeight();
             }
 
-            Common.log("The area is of size: " + picture.getWidth() + "x" + picture.getHeight() );
-
-            bitmap = Helpers.emptyBitMap( getString( R.string.no_image ) , width , height );
+            picture.setImageBitmap(Helpers.emptyBitMap(getString(R.string.no_image), width, height));
         }
         else {
-            Common.log("The image is of size: " + bitmap.getWidth() + "x" + bitmap.getHeight() );
+            picture.setImageURI(uri);
         }
-
-        picture.setImageBitmap(bitmap);
     }
 
     @Override
@@ -112,9 +97,7 @@ public class ImageActivity extends Activity {
     public void save() {
         Intent intent = new Intent();
 
-        intent.putExtra( "data" , bitmap );
-        intent.putExtra( "uri" , uri );
-
+        intent.setData(uri);
         intent.setAction(ACTION);
 
         // http://stackoverflow.com/questions/2497205/how-to-return-a-result-startactivityforresult-from-a-tabhost-activity
@@ -220,22 +203,7 @@ public class ImageActivity extends Activity {
     }
 
     public boolean setUri( Uri newUri ) {
-        if( newUri == null ) {
-            bitmap = null;
-            uri = null;
-            return true;
-        }
-        if( newUri.equals(uri) ) {
-            return true;
-        }
-
-        try {
-            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), newUri);
-            uri = newUri;
-        } catch (IOException e) {
-            Common.toastLong(this, "This device couldn't open " + newUri.toString() + "!: " + e.getMessage());
-            return false;
-        }
+        uri = newUri;
         return true;
     }
 
@@ -245,65 +213,28 @@ public class ImageActivity extends Activity {
         }
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = intent.getExtras();
-            if( extras != null ) {
-                bitmap = (Bitmap)extras.get("data");
+            setUri(intent.getData());
+            saveState();
+            setupPicture();
 
-                uri = intent.getData();
-                saveState();
-
-                setupPicture();
-            }
             return;
         }
 
         if (requestCode == REQUEST_CROP && resultCode == RESULT_OK) {
-            // get the returned data
-            Bundle extras = intent.getExtras();
+            setUri(intent.getData());
+            saveState();
+            setupPicture();
 
-            // get the cropped bitmap
-            if( extras != null ) {
-                bitmap = extras.getParcelable("data");
-                saveState();
-
-                setupPicture();
-            }
             return;
         }
 
         if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
-            // get the returned data
-            Bundle extras = intent.getExtras();
-
-            if (extras != null) {
-                // get the bitmap
-                // Crop image style app (havent seen any yet..)
-                if (extras.containsKey("data")) {
-                    bitmap = extras.getParcelable("data");
-                }
-                // Gallery app (samsung S4)
-                else if (extras.containsKey("selectedCount") && extras.containsKey("selectedItems")) {
-                    int count = extras.getInt("selectedCount");
-                    ArrayList<Uri> uris = extras.getParcelableArrayList("selectedItems");
-
-                    // Bail out..
-                    if (count < 1) {
-                        return;
-                    }
-
-                    setUri(uris.get(0));
-                }
-                saveState();
-                setupPicture();
-            }
-            else {
-                // Photos app (samsung S4)
-                // Dropbox app (samsung S4)
-                setUri(intent.getData());
-
-                saveState();
-                setupPicture();
-            }
+            // Gallery app (samsung S4)
+            // Photos app (samsung S4)
+            // Dropbox app (samsung S4)
+            setUri(intent.getData());
+            saveState();
+            setupPicture();
 
             return;
         }
