@@ -45,6 +45,8 @@ public class CollectionActivity extends AppCompatActivity implements SearchView.
     private void refresh() {
         manager = new UICollection.Manager(this, connection);
 
+        manager.orderBy(Collection.orderByName);
+
         try {
             list.setAdapter(manager);
             final Activity parentActivity = this;

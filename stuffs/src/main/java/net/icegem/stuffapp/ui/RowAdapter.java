@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.widget.BaseAdapter;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -14,6 +16,7 @@ public abstract class RowAdapter<T> extends BaseAdapter {
     protected LayoutInflater inflater;
     protected List<T> original;
     protected List<T> list;
+    private Comparator<T> comparator;
 
     public RowAdapter(Context context, int resourceId, List<T> original)
     {
@@ -29,7 +32,16 @@ public abstract class RowAdapter<T> extends BaseAdapter {
         this.list = original;
     }
 
+
+    public void orderBy( Comparator<T> comparator ) {
+        this.comparator = comparator;
+        notifyDataSetChanged();
+    }
+
     public void notifyDataSetChanged() {
+        if( comparator != null ) {
+            Collections.sort(list, comparator);
+        }
         super.notifyDataSetChanged();
     }
 
