@@ -179,25 +179,24 @@ public class Item implements Parcelable, Jasonable {
         this.location = location;
     }
 
-    public boolean contains(String key)
-    {
-        if(key.equals(code))
-        {
+    public boolean contains(String key) {
+        if(key.equals(code)) {
             return true;
         }
 
-        if( volume.contains(key) )
-        {
+        if( volume.contains(key) ) {
             return true;
         }
 
-        if(location.toLowerCase().contains(key))
-        {
+        if( name.contains(key) ) {
             return true;
         }
 
-        if(type.contains(key))
-        {
+        if(location.toLowerCase().contains(key)) {
+            return true;
+        }
+
+        if(type.contains(key)) {
             return true;
         }
 
