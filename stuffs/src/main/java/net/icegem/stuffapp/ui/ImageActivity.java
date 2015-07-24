@@ -84,8 +84,10 @@ public class ImageActivity extends Activity {
             picture.setImageBitmap(Helpers.emptyBitMap(getString(R.string.no_image), width, height));
         }
         else {
+            System.gc();
             picture.setImageURI(uri);
         }
+        System.gc();
     }
 
     @Override

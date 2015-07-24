@@ -35,7 +35,7 @@ public class ItemEditActivity extends Activity {
     Spinner type = null;
     TextView volume = null;
     TextView link = null;
-    ImageView picture = null;
+    //ImageView picture = null;
     TextView location = null;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -63,7 +63,7 @@ public class ItemEditActivity extends Activity {
         type = (Spinner)findViewById(R.id.type);
         volume = (TextView)findViewById(R.id.volume);
         link = (TextView)findViewById(R.id.link);
-        picture = (ImageView)findViewById(R.id.picture);
+        //picture = (ImageView)findViewById(R.id.picture);
         location = (TextView)findViewById(R.id.location);
 
         // Add click listener, so that we can edit the Text object in a different way..
@@ -81,13 +81,14 @@ public class ItemEditActivity extends Activity {
             }
         });
 
+        /*
         // Picture click
         picture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, ImageActivity.class);
                 intent.putExtra("width" , 1080 );
-                Uri uri = Helpers.stringToUri(item.getPicture());
+                Uri uri = item.getPictureUri();
                 if( uri != null ) {
                     intent.setData(uri);
                 }
@@ -95,6 +96,7 @@ public class ItemEditActivity extends Activity {
                 saveState();
             }
         });
+        */
 
         // Setup types..
         types = DBType.list(connection);
@@ -141,12 +143,14 @@ public class ItemEditActivity extends Activity {
     }
 
     private void setupPicture() {
-        Uri uri = Helpers.stringToUri(item.getPicture());
+        /*
+        Uri uri = item.getPictureUri();
         if( uri != null ) {
             picture.setImageURI(uri);
             return;
         }
         picture.setImageBitmap(Helpers.emptyBitMap(getString(R.string.no_image), 100, 100));
+        */
     }
 
     public void refresh()
@@ -179,6 +183,17 @@ public class ItemEditActivity extends Activity {
         Common.toastLong(this, getString(R.string.start_barcodereader));
 
         Barcode.read( this );
+    }
+
+    public void editPicture(View view) {
+        Intent intent = new Intent(this, ImageActivity.class);
+        intent.putExtra("width" , 1080 );
+        Uri uri = item.getPictureUri();
+        if( uri != null ) {
+            intent.setData(uri);
+        }
+        startActivityForResult(intent, 0);
+        saveState();;
     }
 
     public void save()

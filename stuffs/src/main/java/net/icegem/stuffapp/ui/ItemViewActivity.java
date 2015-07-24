@@ -3,6 +3,7 @@ package net.icegem.stuffapp.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -30,7 +32,12 @@ public class ItemViewActivity extends AppCompatActivity {
     private int uid = 0;
 
     private WebView web = null;
+    private TextView volume = null;
+    private TextView code = null;
+    private TextView type = null;
     private TextView location = null;
+    private TextView description = null;
+    ImageView picture = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +48,12 @@ public class ItemViewActivity extends AppCompatActivity {
 
         web = (WebView) findViewById(R.id.webView);
         location = (TextView) findViewById(R.id.location);
+        picture = (ImageView)findViewById(R.id.picture);
+
+        volume = (TextView) findViewById(R.id.volume);
+        code = (TextView) findViewById(R.id.code);
+        type = (TextView) findViewById(R.id.type);
+        description = (TextView) findViewById(R.id.description);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
@@ -66,13 +79,22 @@ public class ItemViewActivity extends AppCompatActivity {
             return;
         }
 
+        Uri uri = item.getPictureUri();
+        if( uri != null ) {
+            picture.setImageURI(uri);
+        }
+
         Collection collection = item.getCollection();
         if( collection != null ) {
             ActionBar actionBar = getSupportActionBar();
             actionBar.setTitle(collection.getName().toString());
         }
 
+        volume.setText(item.getVolume());
+        code.setText(item.getCode());
+        type.setText(item.getType().toString());
         location.setText(item.getLocation());
+        description.setText(item.getDescription().toString());
 
         String code = item.getCode();
         if (code != null && (!code.isEmpty()))

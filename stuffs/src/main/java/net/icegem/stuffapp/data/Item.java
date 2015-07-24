@@ -1,9 +1,11 @@
 package net.icegem.stuffapp.data;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import net.icegem.stuffapp.Helpers;
 import net.icegem.stuffapp.Jasonable;
 
 import org.json.JSONArray;
@@ -109,6 +111,14 @@ public class Item implements Parcelable, Jasonable {
 
     public String getPicture() {
         return picture;
+    }
+
+    public Uri getPictureUri() {
+        if( picture == null || picture.isEmpty() ) {
+            return null;
+        }
+
+        return Uri.parse(picture);
     }
 
     public void setPicture(String picture) {
