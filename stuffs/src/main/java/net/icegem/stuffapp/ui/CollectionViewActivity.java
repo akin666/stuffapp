@@ -3,6 +3,7 @@ package net.icegem.stuffapp.ui;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -30,16 +32,18 @@ public class CollectionViewActivity extends AppCompatActivity implements SearchV
     private DBConnection connection = null;
     private ListView list = null;
     private SearchView search = null;
+    ImageView picture = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_collection);
+        setContentView(R.layout.activity_collection_view);
 
         connection = new DBConnection(this);
 
         list = (ListView) findViewById(R.id.list);
         search = (SearchView) findViewById(R.id.search);
+        picture = (ImageView)findViewById(R.id.picture);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
@@ -56,6 +60,11 @@ public class CollectionViewActivity extends AppCompatActivity implements SearchV
     private void refresh() {
         if( connection == null || list == null ) {
             return;
+        }
+
+        Uri uri = collection.getPictureUri();
+        if( uri != null && picture != null ) {
+            picture.setImageURI(uri);
         }
 
         try {

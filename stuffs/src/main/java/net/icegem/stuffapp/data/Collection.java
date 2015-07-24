@@ -1,6 +1,7 @@
 package net.icegem.stuffapp.data;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -82,6 +83,14 @@ public class Collection implements Parcelable, Jasonable {
 
     public String getPicture() {
         return picture;
+    }
+
+    public Uri getPictureUri() {
+        if( picture == null || picture.isEmpty() ) {
+            return null;
+        }
+
+        return Uri.parse(picture);
     }
 
     public void setPicture(String value) {

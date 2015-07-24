@@ -27,7 +27,7 @@ public class CollectionEditActivity extends AppCompatActivity {
 
     private EditText name;
     private EditText description;
-    private ImageView picture;
+    //private ImageView picture;
     private EditText link;
 
     @Override
@@ -45,7 +45,7 @@ public class CollectionEditActivity extends AppCompatActivity {
 
         name = (EditText)findViewById(R.id.name);
         description = (EditText)findViewById(R.id.description);
-        picture = (ImageView)findViewById(R.id.picture);
+        //picture = (ImageView)findViewById(R.id.picture);
         link = (EditText)findViewById(R.id.name);
 
         final Collection collection = this.collection;
@@ -73,6 +73,7 @@ public class CollectionEditActivity extends AppCompatActivity {
             }
         });
 
+        /*
         // Picture click
         picture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,7 +81,7 @@ public class CollectionEditActivity extends AppCompatActivity {
                 Intent intent = new Intent(activity, ImageActivity.class);
                 intent.putExtra("width" , 1080 );
 
-                Uri uri = Helpers.stringToUri(collection.getPicture());
+                Uri uri = collection.getPictureUri();
                 if( uri != null ) {
                     intent.setData(uri);
                 }
@@ -88,17 +89,20 @@ public class CollectionEditActivity extends AppCompatActivity {
                 saveState();
             }
         });
+        */
 
         refresh();
     }
 
     private void setupPicture() {
-        Uri uri = Helpers.stringToUri(collection.getPicture());
+        /*
+        Uri uri = collection.getPictureUri();
         if( uri != null ) {
             picture.setImageURI(uri);
             return;
         }
         picture.setImageBitmap(Helpers.emptyBitMap(getString(R.string.no_image), 100, 100));
+        */
     }
 
     public void refresh() {
@@ -142,8 +146,20 @@ public class CollectionEditActivity extends AppCompatActivity {
     }
 
     public void saveState() {
-        collection.setLink( link.getText().toString() );
+        collection.setLink(link.getText().toString());
         getIntent().putExtra(Collection.class.getName(), collection);
+    }
+
+    public void editPicture(View view ){
+        Intent intent = new Intent(this, ImageActivity.class);
+        intent.putExtra("width" , 1080 );
+
+        Uri uri = collection.getPictureUri();
+        if( uri != null ) {
+            intent.setData(uri);
+        }
+        startActivityForResult(intent, 0);
+        saveState();
     }
 
     public void save(View view) {

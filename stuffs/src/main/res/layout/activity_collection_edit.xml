@@ -81,12 +81,21 @@
                 android:text="@string/picture"
                 />
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit"
+                android:onClick="editPicture"
+                style="@style/Base.Widget.AppCompat.Button.Small"/>
+            <!--
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="200dp"
+                android:layout_height="100dp"
+                android:adjustViewBounds="true"
                 android:inputType="none"
+                android:scaleType="centerCrop"
                 android:id="@+id/picture" />
+                -->
         </LinearLayout>
     </LinearLayout>
 
