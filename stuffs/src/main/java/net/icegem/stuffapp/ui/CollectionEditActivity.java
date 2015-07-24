@@ -2,6 +2,7 @@ package net.icegem.stuffapp.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import net.icegem.stuffapp.Barcode;
+import net.icegem.stuffapp.Helpers;
 import net.icegem.stuffapp.R;
 import net.icegem.stuffapp.data.Collection;
 import net.icegem.stuffapp.data.Text;
@@ -64,8 +66,8 @@ public class CollectionEditActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(activity, TextEditActivity.class);
 
-                intent.putExtra(Text.class.getName() , collection.getDescription());
-                intent.putExtra(Text.TARGET , Collection.COLUMN_DESCRIPTION);
+                intent.putExtra(Text.class.getName(), collection.getDescription());
+                intent.putExtra(Text.TARGET, Collection.COLUMN_DESCRIPTION);
 
                 activity.startActivityForResult(intent, 0);
             }
@@ -85,11 +87,26 @@ public class CollectionEditActivity extends AppCompatActivity {
         refresh();
     }
 
+    private void setupPicture() {
+        Uri uri = null;
+
+        if( collection.getPicture() != null && (!collection.getPicture().isEmpty()) ) {
+            uri = Uri.parse(collection.getPicture());
+        }
+
+        if( uri == null ) {
+            picture.setImageBitmap(Helpers.emptyBitMap(getString(R.string.no_image), 100, 100));
+            return;
+        }
+
+        picture.setImageURI( uri );
+    }
+
     public void refresh() {
         name.setText(collection.getName().toString());
         description.setText(collection.getDescription().toString());
-        //picture.setText(collection.getPicture());
         link.setText(collection.getLink());
+        setupPicture();
     }
 
     @Override
@@ -114,7 +131,6 @@ public class CollectionEditActivity extends AppCompatActivity {
 
     public void save() {
         // From ui..
-        //collection.setPicture( picture.getText().toString() );
         collection.setLink( link.getText().toString() );
 
         Intent intent = new Intent();
@@ -124,6 +140,11 @@ public class CollectionEditActivity extends AppCompatActivity {
 
         setResult(Activity.RESULT_OK, intent);
         finish();
+    }
+
+    public void saveState() {
+        collection.setLink( link.getText().toString() );
+        getIntent().putExtra(Collection.class.getName(), collection);
     }
 
     public void save(View view) {
@@ -178,6 +199,9 @@ public class CollectionEditActivity extends AppCompatActivity {
         // Image action.
         if(action.equals(ImageActivity.ACTION)) {
             if (resultCode == RESULT_OK) {
+                collection.setPicture( intent.getData().toString() );
+                setupPicture();
+                saveState();
             }
         }
     }
