@@ -34,6 +34,7 @@ public class ItemEditActivity extends Activity {
     TextView description = null;
     Spinner type = null;
     TextView volume = null;
+    TextView name = null;
     TextView link = null;
     //ImageView picture = null;
     TextView location = null;
@@ -62,6 +63,7 @@ public class ItemEditActivity extends Activity {
         description = (TextView)findViewById(R.id.description);
         type = (Spinner)findViewById(R.id.type);
         volume = (TextView)findViewById(R.id.volume);
+        name = (TextView)findViewById(R.id.name);
         link = (TextView)findViewById(R.id.link);
         //picture = (ImageView)findViewById(R.id.picture);
         location = (TextView)findViewById(R.id.location);
@@ -76,6 +78,17 @@ public class ItemEditActivity extends Activity {
 
                 intent.putExtra(Text.class.getName() , item.getDescription());
                 intent.putExtra(Text.TARGET , Item.COLUMN_DESCRIPTION);
+
+                activity.startActivityForResult(intent, 0);
+            }
+        });
+        name.setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(activity, TextEditActivity.class);
+
+                intent.putExtra(Text.class.getName() , item.getName());
+                intent.putExtra(Text.TARGET , Item.COLUMN_NAME);
 
                 activity.startActivityForResult(intent, 0);
             }
@@ -155,12 +168,11 @@ public class ItemEditActivity extends Activity {
 
     public void refresh()
     {
-        Text description = item.getDescription();
-
         code.setText(item.getCode());
-        if( description != null ) {
-            this.description.setText(description.toString());
-        }
+
+        this.description.setText(item.getDescription().toString());
+        this.name.setText(item.getName().toString());
+
         setupType(item.getType());
 
         volume.setText(item.getVolume());
@@ -262,6 +274,11 @@ public class ItemEditActivity extends Activity {
                 if( target.equals(Item.COLUMN_DESCRIPTION) ) {
                     item.setDescription(text);
                     description.setText(item.getDescription().toString());
+                }
+
+                if( target.equals(Item.COLUMN_NAME) ) {
+                    item.setName(text);
+                    name.setText(item.getName().toString());
                 }
             }
             return;

@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import net.icegem.stuffapp.data.Collection;
 import net.icegem.stuffapp.data.Item;
+import net.icegem.stuffapp.data.Text;
 import net.icegem.stuffapp.data.Type;
 import net.icegem.stuffapp.ui.Common;
 
@@ -21,6 +22,7 @@ public class DBItem {
     public static final String[] columns = {
             Item.COLUMN_IDENTIFIER,
             Item.COLUMN_COLLECTION,
+            Item.COLUMN_NAME,
             Item.COLUMN_DESCRIPTION,
             Item.COLUMN_TYPE,
             Item.COLUMN_CODE,
@@ -34,6 +36,7 @@ public class DBItem {
             "CREATE TABLE IF NOT EXISTS " + TABLE + "(" +
                     Item.COLUMN_IDENTIFIER + " integer primary key autoincrement, " +
                     Item.COLUMN_COLLECTION + " integer, " +
+                    Item.COLUMN_NAME + " integer, " +
                     Item.COLUMN_DESCRIPTION + " integer, " +
                     Item.COLUMN_TYPE + " integer, " +
                     Item.COLUMN_CODE + " text, " +
@@ -118,17 +121,19 @@ public class DBItem {
         {
             // int id = cursor.getInt(0);
             int collection = cursor.getInt(1);
-            int description = cursor.getInt(2);
-            int type = cursor.getInt(3);
+            int name = cursor.getInt(2);
+            int description = cursor.getInt(3);
+            int type = cursor.getInt(4);
 
-            item.setCode( cursor.getString(4) );
-            item.setLink(cursor.getString(5));
-            item.setVolume(cursor.getString(6));
-            item.setPicture(cursor.getString(7));
-            item.setLocation(cursor.getString(8));
+            item.setCode( cursor.getString(5) );
+            item.setLink(cursor.getString(6));
+            item.setVolume(cursor.getString(7));
+            item.setPicture(cursor.getString(8));
+            item.setLocation(cursor.getString(9));
             cursor.close();
 
             item.setCollection(DBCollection.get(db, collection));
+            item.setName(DBText.get(db, name));
             item.setDescription(DBText.get(db, description));
             item.setType(DBType.get(db, type));
         }
@@ -138,11 +143,13 @@ public class DBItem {
     public static Item save(SQLiteDatabase db , Item item) {
         int id = item.getId();
 
+        DBText.save(db, item.getName());
         DBText.save(db, item.getDescription());
 
         ContentValues values = new ContentValues();
 
         values.put(Item.COLUMN_COLLECTION, item.getCollection().getId());
+        values.put(Item.COLUMN_NAME, item.getDescription().getId());
         values.put(Item.COLUMN_DESCRIPTION, item.getDescription().getId());
         values.put(Item.COLUMN_TYPE, item.getType().getId());
         values.put(Item.COLUMN_CODE, item.getCode());
@@ -198,14 +205,15 @@ public class DBItem {
             Item item = new Item(cursor.getInt(0));
 
             int collection = cursor.getInt(1);
-            int description = cursor.getInt(2);
-            int type = cursor.getInt(3);
+            int name = cursor.getInt(2);
+            int description = cursor.getInt(3);
+            int type = cursor.getInt(4);
 
-            item.setCode(cursor.getString(4));
-            item.setLink(cursor.getString(5));
-            item.setVolume(cursor.getString(6));
-            item.setPicture(cursor.getString(7));
-            item.setLocation(cursor.getString(8));
+            item.setCode(cursor.getString(5));
+            item.setLink(cursor.getString(6));
+            item.setVolume(cursor.getString(7));
+            item.setPicture(cursor.getString(8));
+            item.setLocation(cursor.getString(9));
 
             for( final Collection iter : collections ) {
                 if( iter.getId() == collection ) {
@@ -218,6 +226,15 @@ public class DBItem {
                     item.setType(iter);
                     break;
                 }
+            }
+
+            Text text = DBText.get(db , name);
+            if( text != null ) {
+                item.setName(text);
+            }
+            text = DBText.get(db , description);
+            if( text != null ) {
+                item.setDescription(text);
             }
 
             items.add(item);
@@ -238,14 +255,15 @@ public class DBItem {
         while (!cursor.isAfterLast()) {
             Item item = new Item(cursor.getInt(0));
 
-            int description = cursor.getInt(2);
-            int type = cursor.getInt(3);
+            int name = cursor.getInt(2);
+            int description = cursor.getInt(3);
+            int type = cursor.getInt(4);
 
-            item.setCode(cursor.getString(4));
-            item.setLink(cursor.getString(5));
-            item.setVolume(cursor.getString(6));
-            item.setPicture(cursor.getString(7));
-            item.setLocation(cursor.getString(8));
+            item.setCode(cursor.getString(5));
+            item.setLink(cursor.getString(6));
+            item.setVolume(cursor.getString(7));
+            item.setPicture(cursor.getString(8));
+            item.setLocation(cursor.getString(9));
 
             item.setCollection(collection);
 
@@ -254,6 +272,15 @@ public class DBItem {
                     item.setType(iter);
                     break;
                 }
+            }
+
+            Text text = DBText.get(db , name);
+            if( text != null ) {
+                item.setName(text);
+            }
+            text = DBText.get(db , description);
+            if( text != null ) {
+                item.setDescription(text);
             }
 
             items.add(item);

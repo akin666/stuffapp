@@ -31,6 +31,7 @@ public class Item implements Parcelable, Jasonable {
     public static final String COLUMN_CODE = "code";
     public static final String COLUMN_LINK = "link";
     public static final String COLUMN_VOLUME = "volume";
+    public static final String COLUMN_NAME = "name";
     public static final String COLUMN_PICTURE = "picture";
     public static final String COLUMN_LOCATION = "location";
 
@@ -61,6 +62,7 @@ public class Item implements Parcelable, Jasonable {
 
     private int _id = 0;
     private Collection collection;
+    private Text name = new Text();
     private Text description = new Text();
     private Type type;
     private String code;
@@ -93,11 +95,27 @@ public class Item implements Parcelable, Jasonable {
         _id = -(++nid);
     }
 
+    public Text getName() {
+        return name;
+    }
+
+    public void setName(Text name) {
+        if( name == null ) {
+            this.name = new Text();
+            return;
+        }
+        this.name = name;
+    }
+
     public Text getDescription() {
         return description;
     }
 
     public void setDescription(Text description) {
+        if( description == null ) {
+            this.description = new Text();
+            return;
+        }
         this.description = description;
     }
 

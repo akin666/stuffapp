@@ -72,15 +72,6 @@ public class Collection implements Parcelable, Jasonable {
         _id = -(++nid);
     }
 
-    public Text getName()
-    {
-        return name;
-    }
-
-    public Text getDescription() {
-        return description;
-    }
-
     public String getPicture() {
         return picture;
     }
@@ -97,12 +88,28 @@ public class Collection implements Parcelable, Jasonable {
         picture = value;
     }
 
-    public void setDescription(Text description) {
-        this.description = description;
+    public Text getName() {
+        return name;
     }
 
     public void setName(Text name) {
+        if( name == null ) {
+            this.name = new Text();
+            return;
+        }
         this.name = name;
+    }
+
+    public Text getDescription() {
+        return description;
+    }
+
+    public void setDescription(Text description) {
+        if( description == null ) {
+            this.description = new Text();
+            return;
+        }
+        this.description = description;
     }
 
     public String getLink() {

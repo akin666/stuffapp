@@ -12,7 +12,6 @@
         android:orientation="vertical"
         android:layout_margin="5dp">
 
-
         <!-- Volume -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,7 +21,6 @@
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:text="@string/volume"
-                android:id="@+id/volume_header"
                 />
 
             <EditText
@@ -30,6 +28,25 @@
                 android:layout_height="wrap_content"
                 android:inputType="none"
                 android:id="@+id/volume" />
+        </LinearLayout>
+
+        <!-- Name -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:text="@string/name"
+                />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:focusableInTouchMode="false"
+                android:id="@+id/name" />
         </LinearLayout>
 
         <!-- Type -->
@@ -41,7 +58,6 @@
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:text="@string/type"
-                android:id="@+id/type_header"
                 />
 
             <Spinner
@@ -78,7 +94,6 @@
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:text="@string/description"
-                android:id="@+id/description_header"
                 />
             <EditText
                 android:layout_width="match_parent"
@@ -97,7 +112,6 @@
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:text="@string/link"
-                android:id="@+id/link_header"
                 />
 
             <EditText
@@ -116,7 +130,6 @@
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:text="@string/location"
-                android:id="@+id/location_header"
                 />
             <EditText
                 android:layout_width="match_parent"

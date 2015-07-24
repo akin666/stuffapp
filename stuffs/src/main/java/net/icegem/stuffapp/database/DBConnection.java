@@ -13,7 +13,7 @@ public class DBConnection {
     private Context context;
 
     private static final String DATABASE_NAME = "items.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     public DBConnection(Context context)
     {
