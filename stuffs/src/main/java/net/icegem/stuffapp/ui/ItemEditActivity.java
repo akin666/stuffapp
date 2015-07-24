@@ -3,6 +3,7 @@ package net.icegem.stuffapp.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -27,7 +28,6 @@ public class ItemEditActivity extends Activity {
 
     private DBConnection connection;
     private Item item = null;
-    private int uid = 0;
 
     List<Type> types;
     TextView code = null;
@@ -85,11 +85,14 @@ public class ItemEditActivity extends Activity {
         picture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                    saveState();
+                Intent intent = new Intent(activity, ImageActivity.class);
+                intent.putExtra("width" , 1080 );
+                Uri uri = Helpers.stringToUri(item.getPicture());
+                if( uri != null ) {
+                    intent.setData(uri);
                 }
+                startActivityForResult(intent, 0);
+                saveState();
             }
         });
 
@@ -137,17 +140,13 @@ public class ItemEditActivity extends Activity {
         }
     }
 
-    private void setupPicture( String data ) {
-        Bitmap bitmap = Helpers.toBitMap(data);
-
-        if( bitmap == null ) {
-            bitmap = Helpers.emptyBitMap( getString( R.string.no_image ) , 100 , 100 );
+    private void setupPicture() {
+        Uri uri = Helpers.stringToUri(item.getPicture());
+        if( uri != null ) {
+            picture.setImageURI(uri);
+            return;
         }
-        else {
-            Common.log("The image is of size: " + bitmap.getWidth() + "x" + bitmap.getHeight() );
-        }
-
-        picture.setImageBitmap(bitmap);
+        picture.setImageBitmap(Helpers.emptyBitMap(getString(R.string.no_image), 100, 100));
     }
 
     public void refresh()
@@ -162,7 +161,7 @@ public class ItemEditActivity extends Activity {
 
         volume.setText(item.getVolume());
         link.setText( item.getLink() );
-        setupPicture(item.getPicture());
+        setupPicture();
         location.setText(item.getLocation());
     }
 
@@ -188,9 +187,7 @@ public class ItemEditActivity extends Activity {
             item.setCode(code.getText().toString());
             item.setVolume(volume.getText().toString());
             item.setLink(link.getText().toString());
-            //item.setPicture(picture.getText().toString());
             item.setLocation(location.getText().toString());
-
 
             Intent intent = new Intent();
 
@@ -255,21 +252,13 @@ public class ItemEditActivity extends Activity {
             return;
         }
 
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = intent.getExtras();
-            Bitmap bitmap = (Bitmap)extras.get("data");
-
-            if( bitmap == null ) {
-                return;
+        // Image action.
+        if(action.equals(ImageActivity.ACTION)) {
+            if (resultCode == RESULT_OK) {
+                item.setPicture( intent.getData().toString() );
+                setupPicture();
+                saveState();
             }
-
-            bitmap = Helpers.resizeBitmap( bitmap , 100 , 100 );
-
-            String str = Helpers.toString(bitmap);
-            item.setPicture(str);
-
-            saveState();
-            return;
         }
     }
 
