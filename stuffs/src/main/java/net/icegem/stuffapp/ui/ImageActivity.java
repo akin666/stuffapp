@@ -16,11 +16,17 @@ import android.widget.ImageView;
 import net.icegem.stuffapp.Helpers;
 import net.icegem.stuffapp.R;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+
 public class ImageActivity extends Activity {
     public static final String ACTION = "Image_Action";
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-    static final int REQUEST_CROP = 2;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_CROP = 2;
+    private static final int REQUEST_GALLERY = 3;
+
     private Uri uri;
 
     ImageView picture = null;
@@ -119,10 +125,8 @@ public class ImageActivity extends Activity {
         }
     }
 
-    private void performCrop() {
-        // take care of exceptions
+    private void crop() {
         try {
-            // call the standard crop action intent (the user device may not support it)
             Intent cropIntent = new Intent("com.android.camera.action.CROP");
 
             Intent intent = getIntent();
@@ -147,28 +151,92 @@ public class ImageActivity extends Activity {
             cropIntent.putExtra("crop", "true");
             // retrieve data on return
             cropIntent.putExtra("return-data", true);
-            // start the activity - we handle returning in onActivityResult
+
             startActivityForResult(cropIntent, REQUEST_CROP);
         }
-        // respond to users whose devices do not support the crop action
         catch (ActivityNotFoundException e) {
             Common.toastLong(this, "This device doesn't support the crop action!: " + e.getMessage());
         }
     }
 
+    private void camera() {
+        try {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+        catch (ActivityNotFoundException e) {
+            Common.toastLong(this, "This device doesn't support the camera action!: " + e.getMessage());
+        }
+    }
+
+    private void gallery() {
+        Intent intent = new Intent();
+
+        Bundle extras = getIntent().getExtras();
+
+        // call android default gallery
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+
+        // crop image
+        if(extras.containsKey("width") ){
+            intent.putExtra("outputX", extras.getInt("width"));
+        }
+        if(extras.containsKey("height") ){
+            intent.putExtra("outputY", extras.getInt("height"));
+        }
+        if(extras.containsKey("aspectX") ){
+            intent.putExtra("aspectX", extras.getFloat("aspectX"));
+        }
+        if(extras.containsKey("aspectY") ){
+            intent.putExtra("aspectY", extras.getFloat("aspectY"));
+        }
+
+        try {
+            intent.putExtra("return-data", true);
+            startActivityForResult( Intent.createChooser(intent,"Complete action using"), REQUEST_GALLERY );
+        }
+        catch (ActivityNotFoundException e) {
+            Common.toastLong(this, "This device doesn't support the camera action!: " + e.getMessage());
+        }
+    }
+
     public void crop(View view) {
-        performCrop();
+        crop();
+    }
+
+    public void gallery(View view) {
+        gallery();
     }
 
     public void camera(View view) {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }
+        camera();
     }
 
     public void dismiss(View view) {
         finish();
+    }
+
+    public boolean setUri( Uri newUri ) {
+        if( newUri == null ) {
+            bitmap = null;
+            uri = null;
+            return true;
+        }
+        if( newUri.equals(uri) ) {
+            return true;
+        }
+
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), newUri);
+            uri = newUri;
+        } catch (IOException e) {
+            Common.toastLong(this, "This device couldn't open " + newUri.toString() + "!: " + e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -178,24 +246,66 @@ public class ImageActivity extends Activity {
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = intent.getExtras();
-            bitmap = (Bitmap)extras.get("data");
+            if( extras != null ) {
+                bitmap = (Bitmap)extras.get("data");
 
-            uri = intent.getData();
-            saveState();
+                uri = intent.getData();
+                saveState();
 
-            setupPicture();
-
+                setupPicture();
+            }
             return;
         }
 
         if (requestCode == REQUEST_CROP && resultCode == RESULT_OK) {
             // get the returned data
             Bundle extras = intent.getExtras();
-            // get the cropped bitmap
-            bitmap = extras.getParcelable("data");
-            saveState();
 
-            setupPicture();
+            // get the cropped bitmap
+            if( extras != null ) {
+                bitmap = extras.getParcelable("data");
+                saveState();
+
+                setupPicture();
+            }
+            return;
+        }
+
+        if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
+            // get the returned data
+            Bundle extras = intent.getExtras();
+
+            if (extras != null) {
+                // get the bitmap
+                // Crop image style app (havent seen any yet..)
+                if (extras.containsKey("data")) {
+                    bitmap = extras.getParcelable("data");
+                }
+                // Gallery app (samsung S4)
+                else if (extras.containsKey("selectedCount") && extras.containsKey("selectedItems")) {
+                    int count = extras.getInt("selectedCount");
+                    ArrayList<Uri> uris = extras.getParcelableArrayList("selectedItems");
+
+                    // Bail out..
+                    if (count < 1) {
+                        return;
+                    }
+
+                    setUri(uris.get(0));
+                }
+                saveState();
+                setupPicture();
+            }
+            else {
+                // Photos app (samsung S4)
+                // Dropbox app (samsung S4)
+                setUri(intent.getData());
+
+                saveState();
+                setupPicture();
+            }
+
+            return;
         }
     }
 }

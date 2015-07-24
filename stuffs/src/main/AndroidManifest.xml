@@ -2,8 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.icegem.stuffapp" >
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- to get webpages -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- for images -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- for gallery images -->
 
     <uses-feature
         android:name="android.hardware.camera"
