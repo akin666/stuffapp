@@ -165,11 +165,21 @@ public class Helpers {
     }
 
     public static Bitmap cropBitmap(Bitmap bitmap, int x, int y, int width, int height) {
-        return  Bitmap.createBitmap(bitmap, x,y,width, height);
+        return  Bitmap.createBitmap(bitmap, x, y, width, height);
     }
 
     public static String createGUID() {
         UUID uid = UUID.randomUUID();
         return uid.toString();
+    }
+
+    public static Uri stringToUri( String string ) {
+        if( string == null || string.isEmpty() ) {
+            return null;
+        }
+
+        Uri uri = Uri.parse(string);
+
+        return uri;
     }
 }

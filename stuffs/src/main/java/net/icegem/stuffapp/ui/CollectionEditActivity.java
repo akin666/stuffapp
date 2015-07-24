@@ -79,8 +79,13 @@ public class CollectionEditActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(activity, ImageActivity.class);
                 intent.putExtra("width" , 1080 );
+
+                Uri uri = Helpers.stringToUri(collection.getPicture());
+                if( uri != null ) {
+                    intent.setData(uri);
+                }
                 startActivityForResult(intent, 0);
-                //saveState();
+                saveState();
             }
         });
 
@@ -88,18 +93,12 @@ public class CollectionEditActivity extends AppCompatActivity {
     }
 
     private void setupPicture() {
-        Uri uri = null;
-
-        if( collection.getPicture() != null && (!collection.getPicture().isEmpty()) ) {
-            uri = Uri.parse(collection.getPicture());
-        }
-
-        if( uri == null ) {
-            picture.setImageBitmap(Helpers.emptyBitMap(getString(R.string.no_image), 100, 100));
+        Uri uri = Helpers.stringToUri(collection.getPicture());
+        if( uri != null ) {
+            picture.setImageURI(uri);
             return;
         }
-
-        picture.setImageURI( uri );
+        picture.setImageBitmap(Helpers.emptyBitMap(getString(R.string.no_image), 100, 100));
     }
 
     public void refresh() {
