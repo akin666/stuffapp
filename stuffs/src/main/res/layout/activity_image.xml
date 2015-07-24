@@ -39,9 +39,20 @@
 
         <Button
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_gallery"
+            android:text="@string/gallery"
+            android:onClick="gallery"
+            android:layout_alignParentEnd="false"
+            android:layout_toEndOf="@+id/id_camera"
+            style="@style/Base.Widget.AppCompat.Button.Small" />
+
+        <Button
+            android:layout_width="wrap_content"
             android:minWidth="80dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/id_crop"
+            android:layout_alignParentEnd="false"
             android:id="@+id/id_dismiss"
             android:text="@string/dismiss"
             android:onClick="dismiss"

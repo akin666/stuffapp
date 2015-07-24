@@ -69,6 +69,7 @@
     <string name="title_activity_image">Image edit</string>
     <string name="crop">Crop</string>
     <string name="camera">Take a picture</string>
+    <string name="gallery">Gallery</string>
 
     <color name="warning">#FF0000</color>
     <color name="white">#FFFFFF</color>
