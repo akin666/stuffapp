@@ -32,7 +32,8 @@ public class CollectionViewActivity extends AppCompatActivity implements SearchV
     private DBConnection connection = null;
     private ListView list = null;
     private SearchView search = null;
-    ImageView picture = null;
+    private ImageView picture = null;
+    private UIITem.RowAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +73,7 @@ public class CollectionViewActivity extends AppCompatActivity implements SearchV
             actionBar.setTitle(collection.getName().toString());
 
             List<Item> values = DBItem.listByCollection(connection, collection.getId());
-            ListAdapter adapter = new UIITem.RowAdapter(this, values);
+            adapter = new UIITem.RowAdapter(this, values);
             list.setAdapter(adapter);
             final Activity parentActivity = this;
             list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -91,6 +92,8 @@ public class CollectionViewActivity extends AppCompatActivity implements SearchV
                     }
                 }
             });
+
+            adapter.orderBy(Item.orderByVolume);
 
             list.setTextFilterEnabled(true);
             setupSearch();
