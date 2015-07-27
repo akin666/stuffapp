@@ -10,6 +10,13 @@
         android:layout_height="fill_parent"
         android:scaleType="matrix" />
 
+    <ImageView
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:id="@+id/hud"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scaleType="matrix" />
+
     <LinearLayout
         android:layout_marginBottom="10dp"
         android:padding="5dp"

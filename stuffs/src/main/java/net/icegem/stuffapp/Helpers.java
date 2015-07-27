@@ -59,6 +59,13 @@ public class Helpers {
         return maxWidth / bounds.width();
     }
 
+    public static Bitmap emptyBitMap( int w , int h ) {
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+        Bitmap bitmap = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+
+        return bitmap;
+    }
+
     public static Bitmap emptyBitMap( String str ,  int w , int h ) {
         Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
         Bitmap bitmap = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
