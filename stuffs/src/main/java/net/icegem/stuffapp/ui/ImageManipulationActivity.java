@@ -44,7 +44,8 @@ public class ImageManipulationActivity extends Activity implements GestureDetect
 
         picture = (ImageView)findViewById(R.id.picture);
         /// TODO! For some reason, setImageURI scales the image, investigate why.
-        //picture.setImageURI(uri);
+        /// (something todo with screen DPI, jeez.. why at this abstraction level, stupid..)
+        /// picture.setImageURI(uri);
 
         Bitmap bitmap = Helpers.loadBitmap( this , uri );
         picture.setImageBitmap( bitmap );
@@ -54,14 +55,21 @@ public class ImageManipulationActivity extends Activity implements GestureDetect
         picture.setScaleType(ImageView.ScaleType.MATRIX);
         picture.setAdjustViewBounds(false);
 
-        calculateMatrix(0.0f, 1.0f);
-
         gestures = new GestureDetection( this , picture );
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        if( hasFocus ) {
+            calculateMatrix(0.0f, 1.0f, 0.0f , 0.0f);
+        }
     }
 
     @Override
@@ -79,11 +87,23 @@ public class ImageManipulationActivity extends Activity implements GestureDetect
         return super.onOptionsItemSelected(item);
     }
 
+    public void save(View view) {
+        finish();
+    }
+
+    public void reset(View view) {
+        scale = 1.0f;
+        rotation = 0.0f;
+        offset.set(0 , 0);
+
+        calculateMatrix(0.0f, 1.0f, 0.0f , 0.0f);
+    }
+
     public void dismiss(View view) {
         finish();
     }
 
-    public void calculateMatrix( float aRotation , float aScale ) {
+    public void calculateMatrix( float aRotation , float aScale , float ax, float ay) {
 
         int w = picture.getWidth();
         int h = picture.getHeight();
@@ -102,6 +122,7 @@ public class ImageManipulationActivity extends Activity implements GestureDetect
         matrix.postScale(scale, scale);
 
         matrix.postTranslate(w / 2.0f, h / 2.0f);
+        matrix.postTranslate( offset.x + ax, offset.y + ay);
 
         picture.setImageMatrix( matrix );
     }
@@ -117,8 +138,13 @@ public class ImageManipulationActivity extends Activity implements GestureDetect
     }
 
     @Override
+    public void beginMove(GestureDetection detection) {
+    }
+
+    @Override
     public void onGesture(GestureDetection detection) {
-        calculateMatrix(detection.getAngle(), detection.getScale());
+        PointF delta = detection.getMoveDelta();
+        calculateMatrix(detection.getAngle(), detection.getScale() , delta.x , delta.y );
     }
 
     @Override
@@ -129,5 +155,12 @@ public class ImageManipulationActivity extends Activity implements GestureDetect
         if( scale < (-Float.MAX_VALUE) ) {
             scale = -Float.MAX_VALUE;
         }
+    }
+
+    @Override
+    public void endMove(GestureDetection detection) {
+        PointF delta = detection.getMoveDelta();
+        offset.x += delta.x;
+        offset.y += delta.y;
     }
 }

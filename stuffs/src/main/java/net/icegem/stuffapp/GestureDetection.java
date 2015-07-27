@@ -17,7 +17,10 @@ public class GestureDetection {
     private PointF point2 = new PointF();
     private int ptrID1, ptrID2;
 
-    private float distance;
+    public PointF origin = new PointF(0,0);
+    public PointF delta = new PointF(0,0);
+
+    private float scaleDistance;
 
     private float angle;
     private float scale;
@@ -34,9 +37,19 @@ public class GestureDetection {
         return scale;
     }
 
+    public PointF getPoint() {
+        return origin;
+    }
+
+    public PointF getMoveDelta() {
+        return delta;
+    }
+
     public GestureDetection(OnGestureListener listener, View view) {
         this.angle = 0.0f;
         this.scale = 1.0f;
+        delta.x = 0;
+        delta.y = 0;
 
         this.listener = listener;
         this.view = view;
@@ -47,10 +60,46 @@ public class GestureDetection {
     public void reset() {
         this.angle = 0.0f;
         this.scale = 1.0f;
+        delta.x = 0;
+        delta.y = 0;
     }
 
     public boolean onTouchEvent(MotionEvent event){
-        switch (event.getActionMasked()) {
+        PointF middle = getMiddle(event);
+        int action = event.getActionMasked();
+
+        Log.w(Constants.AppName, "---------------------------------");
+        // Move logic
+        switch(action) {
+            case MotionEvent.ACTION_POINTER_DOWN:
+                origin.set(middle.x - delta.x , middle.y - delta.y);
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+                origin.set(middle.x - delta.x , middle.y - delta.y);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                delta.set( middle.x - origin.x, middle.y - origin.y );
+                break;
+            case MotionEvent.ACTION_DOWN:
+                origin.set(middle);
+                delta.set(0 , 0);
+                if (listener != null) {
+                    listener.beginMove(this);
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP:
+                if (listener != null) {
+                    listener.endMove(this);
+                }
+                delta.set(0 , 0);
+                break;
+            default:
+                break;
+        }
+
+        // Scale rotate logic
+        switch (action) {
             case MotionEvent.ACTION_OUTSIDE:
                 break;
             case MotionEvent.ACTION_DOWN:
@@ -62,13 +111,11 @@ public class GestureDetection {
                 getRawPoint(event, ptrID1, point1);
                 getRawPoint(event, ptrID2, point2);
 
-                distance = 1.0f / distanceBetweenPoints( point1 , point2 );
-                scale = 1.0f;
+                scaleDistance = 1.0f / distanceBetweenPoints( point1 , point2 );
 
                 if (listener != null) {
                     listener.beginGesture(this);
                 }
-
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (ptrID1 != INVALID_POINTER_ID && ptrID2 != INVALID_POINTER_ID){
@@ -79,12 +126,7 @@ public class GestureDetection {
                     getRawPoint(event, ptrID2, tpoint2);
 
                     angle = angleBetweenLines(point1, point2, tpoint1, tpoint2);
-
-                    scale = distance * distanceBetweenPoints(tpoint1, tpoint2);
-
-                    if (listener != null) {
-                        listener.onGesture(this);
-                    }
+                    scale = scaleDistance * distanceBetweenPoints(tpoint1, tpoint2);
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -92,10 +134,11 @@ public class GestureDetection {
                 break;
             case MotionEvent.ACTION_POINTER_UP:
                 ptrID2 = INVALID_POINTER_ID;
-
                 if (listener != null) {
                     listener.endGesture(this);
                 }
+                scale = 1.0f;
+                angle = 0.0f;
                 break;
             case MotionEvent.ACTION_CANCEL:
                 ptrID1 = INVALID_POINTER_ID;
@@ -108,7 +151,49 @@ public class GestureDetection {
             default:
                 break;
         }
+
+        if( action == MotionEvent.ACTION_MOVE ) {
+            if (listener != null) {
+                listener.onGesture(this);
+            }
+        }
+
         return true;
+    }
+
+    private PointF getMiddle( PointF p , PointF p2 ) {
+        return new PointF(
+                p.x + (PointF.length( p.x , p2.x ) / 2.0f) ,
+                p.y + (PointF.length( p.y , p2.y ) / 2.0f )
+        );
+    }
+
+    private PointF getMiddle(MotionEvent ev) {
+        PointF point = new PointF(0,0);
+        final int[] location = { 0, 0 };
+        view.getLocationOnScreen(location);
+
+        int count = ev.getPointerCount();
+        for (int i = 0; i < count; ++i) {
+            float x = ev.getX(i);
+            float y = ev.getY(i);
+
+            double angle = Math.toDegrees(Math.atan2(y, x));
+            angle += view.getRotation();
+
+            final float length = PointF.length(x, y);
+
+            x = (float) (length * Math.cos(Math.toRadians(angle))) + location[0];
+            y = (float) (length * Math.sin(Math.toRadians(angle))) + location[1];
+
+            point.x += x;
+            point.y += y;
+        }
+
+        point.x /= count;
+        point.y /= count;
+
+        return point;
     }
 
     void getRawPoint(MotionEvent ev, int index, PointF point){
@@ -145,8 +230,10 @@ public class GestureDetection {
     }
 
     public interface OnGestureListener {
+        void beginMove(GestureDetection detection );
         void beginGesture(GestureDetection detection );
         void onGesture(GestureDetection detection );
         void endGesture(GestureDetection detection );
+        void endMove(GestureDetection detection );
     }
 }
