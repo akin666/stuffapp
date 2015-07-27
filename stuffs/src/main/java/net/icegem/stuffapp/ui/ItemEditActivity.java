@@ -194,7 +194,7 @@ public class ItemEditActivity extends Activity {
     public void readBarcode(View view) {
         Common.toastLong(this, getString(R.string.start_barcodereader));
 
-        Barcode.read( this );
+        Barcode.read(this);
     }
 
     public void editPicture(View view) {
@@ -287,9 +287,12 @@ public class ItemEditActivity extends Activity {
         // Image action.
         if(action.equals(ImageActivity.ACTION)) {
             if (resultCode == RESULT_OK) {
-                item.setPicture( intent.getData().toString() );
-                setupPicture();
-                saveState();
+                Uri nUri = intent.getData();
+                if( nUri != null ) {
+                    item.setPicture(nUri.toString());
+                    setupPicture();
+                    saveState();
+                }
             }
         }
     }
