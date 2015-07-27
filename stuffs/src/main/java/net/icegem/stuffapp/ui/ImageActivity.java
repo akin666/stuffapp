@@ -28,8 +28,7 @@ public class ImageActivity extends Activity {
     private static final int REQUEST_GALLERY = 3;
 
     private Uri uri;
-
-    ImageView picture = null;
+    private ImageView picture = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +111,8 @@ public class ImageActivity extends Activity {
 
     private void crop() {
         try {
-            Intent cropIntent = new Intent("com.android.camera.action.CROP");
+            Intent cropIntent = new Intent(this, ImageManipulationActivity.class);
+            //Intent cropIntent = new Intent("com.android.camera.action.CROP");
 
             Intent intent = getIntent();
             Bundle extras = intent.getExtras();
