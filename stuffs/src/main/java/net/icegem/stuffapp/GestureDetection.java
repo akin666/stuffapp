@@ -72,15 +72,15 @@ public class GestureDetection {
         // Move logic
         switch(action) {
             case MotionEvent.ACTION_POINTER_DOWN:
-                origin.set(middle.x - delta.x , middle.y - delta.y);
-                break;
             case MotionEvent.ACTION_POINTER_UP:
-                origin.set(middle.x - delta.x , middle.y - delta.y);
-                break;
+                Log.w(Constants.AppName, "ACTION_POINTER_UP");
+                origin.set(middle.x + delta.x, middle.y + delta.y);
             case MotionEvent.ACTION_MOVE:
-                delta.set( middle.x - origin.x, middle.y - origin.y );
+                Log.w(Constants.AppName, "ACTION_MOVE");
+                delta.set(middle.x - origin.x, middle.y - origin.y);
                 break;
             case MotionEvent.ACTION_DOWN:
+                Log.w(Constants.AppName, "ACTION_DOWN");
                 origin.set(middle);
                 delta.set(0 , 0);
                 if (listener != null) {
@@ -89,14 +89,21 @@ public class GestureDetection {
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
+                Log.w(Constants.AppName, "ACTION_CANCEL / ACTION_UP");
                 if (listener != null) {
                     listener.endMove(this);
                 }
                 delta.set(0 , 0);
                 break;
             default:
+                Log.w(Constants.AppName, "skip");
                 break;
         }
+
+        Log.w(Constants.AppName, "Origin: " + origin.x + "x" + origin.y);
+        Log.w(Constants.AppName, "Middle: " + middle.x + "x" + middle.y);
+        Log.w(Constants.AppName, "MiddXX: " + (origin.x + delta.x) + "x" + (origin.y + delta.y));
+        Log.w(Constants.AppName, "Delta: " + delta.x + "x" + delta.y);
 
         // Scale rotate logic
         switch (action) {
