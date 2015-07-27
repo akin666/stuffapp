@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -16,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 /**
@@ -127,6 +129,34 @@ public class Helpers {
         } catch (IOException e) {
         }
         return null;
+    }
+
+    public static Point dimensionsBitmap(Context context , Uri uri) {
+        int w = 0;
+        int h = 0;
+
+        try {
+            InputStream input = context.getContentResolver().openInputStream(uri);
+
+            BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
+            onlyBoundsOptions.inJustDecodeBounds = true;
+            onlyBoundsOptions.inDither=true;//optional
+            onlyBoundsOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//optional
+            BitmapFactory.decodeStream(input, null, onlyBoundsOptions);
+            input.close();
+
+            if ((onlyBoundsOptions.outWidth == -1) || (onlyBoundsOptions.outHeight == -1))
+                return null;
+
+            w = onlyBoundsOptions.outWidth;
+            h = onlyBoundsOptions.outHeight;
+        } catch (IOException e) {
+            // Unable to create file, likely because external storage is
+            // not currently mounted.
+            return null;
+        }
+
+        return new Point(w,h);
     }
 
     public static Uri saveBitmap( Context context , Bitmap bitmap ) {
