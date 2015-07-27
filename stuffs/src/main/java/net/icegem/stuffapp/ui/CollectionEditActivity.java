@@ -214,9 +214,12 @@ public class CollectionEditActivity extends AppCompatActivity {
         // Image action.
         if(action.equals(ImageActivity.ACTION)) {
             if (resultCode == RESULT_OK) {
-                collection.setPicture( intent.getData().toString() );
-                setupPicture();
-                saveState();
+                Uri nUri = intent.getData();
+                if( nUri != null ) {
+                    collection.setPicture(nUri.toString());
+                    setupPicture();
+                    saveState();
+                }
             }
         }
     }
