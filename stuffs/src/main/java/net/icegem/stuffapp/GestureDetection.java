@@ -15,6 +15,7 @@ public class GestureDetection {
     private static final int INVALID_POINTER_ID = -1;
     private PointF point1 = new PointF();
     private PointF point2 = new PointF();
+
     private int ptrID1, ptrID2;
 
     public PointF origin = new PointF(0,0);
@@ -53,8 +54,6 @@ public class GestureDetection {
 
         this.listener = listener;
         this.view = view;
-        this.ptrID1 = INVALID_POINTER_ID;
-        this.ptrID2 = INVALID_POINTER_ID;
     }
 
     public void reset() {
@@ -65,25 +64,37 @@ public class GestureDetection {
     }
 
     public boolean onTouchEvent(MotionEvent event){
-        PointF middle = getMiddle(event);
+        final PointF beta;
         int action = event.getActionMasked();
+
+        if( action == MotionEvent.ACTION_POINTER_UP) {
+            beta = getMiddle(event , event.getActionIndex());
+        } else {
+            beta = getMiddle(event);
+        }
 
         // Move logic
         switch(action) {
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_POINTER_UP:
-                origin.set(middle.x - delta.x, middle.y - delta.y);
+                origin.set(beta.x - delta.x, beta.y - delta.y);
+                break;
             case MotionEvent.ACTION_MOVE:
-                delta.set(middle.x - origin.x,middle.y - origin.y);
+                delta.set(beta.x - origin.x, beta.y - origin.y);
                 break;
             case MotionEvent.ACTION_DOWN:
-                origin.set(middle);
+                origin.set(beta);
                 delta.set(0 , 0);
                 if (listener != null) {
                     listener.beginMove(this);
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
+                delta.set(0 , 0);
+                if (listener != null) {
+                    listener.endMove(this);
+                }
+                break;
             case MotionEvent.ACTION_UP:
                 if (listener != null) {
                     listener.endMove(this);
@@ -94,6 +105,7 @@ public class GestureDetection {
                 break;
         }
 
+        boolean assigned = false;
         // Scale rotate logic
         switch (action) {
             case MotionEvent.ACTION_OUTSIDE:
@@ -102,15 +114,24 @@ public class GestureDetection {
                 ptrID1 = event.getPointerId(event.getActionIndex());
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
-                ptrID2 = event.getPointerId(event.getActionIndex());
+                if( ptrID1 == INVALID_POINTER_ID ) {
+                    assigned = true;
+                    ptrID1 = event.getPointerId(event.getActionIndex());
+                }
+                else if( ptrID2 == INVALID_POINTER_ID ) {
+                    assigned = true;
+                    ptrID2 = event.getPointerId(event.getActionIndex());
+                }
 
-                getRawPoint(event, ptrID1, point1);
-                getRawPoint(event, ptrID2, point2);
+                if (ptrID1 != INVALID_POINTER_ID && ptrID2 != INVALID_POINTER_ID && assigned) {
+                    getRawPoint(event, ptrID1, point1);
+                    getRawPoint(event, ptrID2, point2);
 
-                scaleDistance = 1.0f / distanceBetweenPoints( point1 , point2 );
+                    scaleDistance = 1.0f / distanceBetweenPoints(point1, point2);
 
-                if (listener != null) {
-                    listener.beginGesture(this);
+                    if (listener != null) {
+                        listener.beginGesture(this);
+                    }
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -127,19 +148,31 @@ public class GestureDetection {
                 break;
             case MotionEvent.ACTION_UP:
                 ptrID1 = INVALID_POINTER_ID;
+                ptrID2 = INVALID_POINTER_ID;
                 break;
             case MotionEvent.ACTION_POINTER_UP:
-                ptrID2 = INVALID_POINTER_ID;
-                if (listener != null) {
-                    listener.endGesture(this);
+                if( event.getActionIndex() == ptrID1 ) {
+                    assigned = true;
+                    ptrID1 = INVALID_POINTER_ID;
                 }
-                scale = 1.0f;
-                angle = 0.0f;
+                if( event.getActionIndex() == ptrID2 ) {
+                    assigned = true;
+                    ptrID2 = INVALID_POINTER_ID;
+                }
+                if ((ptrID1 == INVALID_POINTER_ID || ptrID2 == INVALID_POINTER_ID) && assigned) {
+                    if (listener != null) {
+                        listener.endGesture(this);
+                    }
+                    scale = 1.0f;
+                    angle = 0.0f;
+                }
                 break;
             case MotionEvent.ACTION_CANCEL:
                 ptrID1 = INVALID_POINTER_ID;
                 ptrID2 = INVALID_POINTER_ID;
 
+                scale = 1.0f;
+                angle = 0.0f;
                 if (listener != null) {
                     listener.endGesture(this);
                 }
@@ -164,7 +197,7 @@ public class GestureDetection {
         );
     }
 
-    private PointF getMiddle(MotionEvent ev) {
+    private PointF getMiddle( MotionEvent ev ) {
         PointF point = new PointF(0,0);
         final int[] location = { 0, 0 };
         view.getLocationOnScreen(location);
@@ -188,6 +221,42 @@ public class GestureDetection {
 
         point.x /= count;
         point.y /= count;
+
+        return point;
+    }
+
+    private PointF getMiddle(MotionEvent ev , int skipIndex) {
+        PointF point = new PointF(0,0);
+        int count = ev.getPointerCount();
+        final int[] location = { 0, 0 };
+        view.getLocationOnScreen(location);
+
+        if( count <= 1 ) {
+            return point;
+        }
+
+        for (int i = 0; i < count; ++i) {
+            if( i == skipIndex ) {
+                continue;
+            }
+
+            float x = ev.getX(i);
+            float y = ev.getY(i);
+
+            double angle = Math.toDegrees(Math.atan2(y, x));
+            angle += view.getRotation();
+
+            final float length = PointF.length(x, y);
+
+            x = (float) (length * Math.cos(Math.toRadians(angle))) + location[0];
+            y = (float) (length * Math.sin(Math.toRadians(angle))) + location[1];
+
+            point.x += x;
+            point.y += y;
+        }
+
+        point.x /= (count - 1);
+        point.y /= (count - 1);
 
         return point;
     }
