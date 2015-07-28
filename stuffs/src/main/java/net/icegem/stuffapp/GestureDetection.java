@@ -26,6 +26,8 @@ public class GestureDetection {
     public PointF origin = new PointF(0,0);
     public PointF delta = new PointF(0,0);
 
+    public PointF start = new PointF(0,0);
+
     private float scaleDistance;
 
     private float angle;
@@ -81,9 +83,23 @@ public class GestureDetection {
     }
 
     public boolean onTouchEvent(MotionEvent event){
-        final PointF beta;
-        int action = event.getActionMasked();
 
+        final int action = event.getActionMasked();
+        switch( action ) {
+            case MotionEvent.ACTION_POINTER_DOWN:
+            case MotionEvent.ACTION_POINTER_UP:
+            case MotionEvent.ACTION_MOVE:
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP:
+            default:
+                break;
+        }
+
+
+
+
+        final PointF beta;
         if( action == MotionEvent.ACTION_POINTER_UP) {
             beta = getMiddle(event , event.getActionIndex());
         } else {
@@ -319,16 +335,17 @@ public class GestureDetection {
         void endMove(GestureDetection detection );
     }
 
-    public class Common {
-        private PointF start = new PointF(0,0);
-        private PointF middle = new PointF(0,0);
-    }
-
     public static class Rotate {
         private Listener listener;
         private float angle;
 
-        public void on( Common common ) {
+        public void begin( GestureDetection detection ) {
+        }
+
+        public void move( GestureDetection detection ) {
+        }
+
+        public void end( GestureDetection detection ) {
         }
 
         public float getAngle() {
@@ -350,7 +367,13 @@ public class GestureDetection {
         private Listener listener;
         private float scale;
 
-        public void on( Common common ) {
+        public void begin( GestureDetection detection ) {
+        }
+
+        public void move( GestureDetection detection ) {
+        }
+
+        public void end( GestureDetection detection ) {
         }
 
         public float getScale() {
@@ -372,7 +395,13 @@ public class GestureDetection {
         private Listener listener;
         private PointF delta = new PointF(0,0);
 
-        public void on( Common common ) {
+        public void begin( GestureDetection detection ) {
+        }
+
+        public void move( GestureDetection detection ) {
+        }
+
+        public void end( GestureDetection detection ) {
         }
 
         public PointF getDelta() {
