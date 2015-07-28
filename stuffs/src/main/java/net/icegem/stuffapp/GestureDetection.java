@@ -13,6 +13,11 @@ import android.view.View;
  */
 public class GestureDetection {
     private static final int INVALID_POINTER_ID = -1;
+
+    private Pan panDetection = new Pan();
+    private Pinch pinchDetection = new Pinch();
+    private Rotate rotateDetection = new Rotate();
+
     private PointF point1 = new PointF();
     private PointF point2 = new PointF();
 
@@ -44,6 +49,18 @@ public class GestureDetection {
 
     public PointF getMoveDelta() {
         return delta;
+    }
+
+    public Pan pan() {
+        return panDetection;
+    }
+
+    public Pinch pinch() {
+        return pinchDetection;
+    }
+
+    public Rotate rotate() {
+        return rotateDetection;
     }
 
     public GestureDetection(OnGestureListener listener, View view) {
@@ -300,5 +317,76 @@ public class GestureDetection {
         void onGesture(GestureDetection detection );
         void endGesture(GestureDetection detection );
         void endMove(GestureDetection detection );
+    }
+
+    public class Common {
+        private PointF start = new PointF(0,0);
+        private PointF middle = new PointF(0,0);
+    }
+
+    public static class Rotate {
+        private Listener listener;
+        private float angle;
+
+        public void on( Common common ) {
+        }
+
+        public float getAngle() {
+            return angle;
+        }
+
+        void set( Listener listener ) {
+            this.listener = listener;
+        }
+
+        public interface Listener {
+            void onBegin( Rotate rotate );
+            void onMove( Rotate rotate );
+            void onEnd( Rotate rotate );
+        }
+    }
+
+    public static class Pinch {
+        private Listener listener;
+        private float scale;
+
+        public void on( Common common ) {
+        }
+
+        public float getScale() {
+            return scale;
+        }
+
+        void set( Listener listener ) {
+            this.listener = listener;
+        }
+
+        public interface Listener {
+            void onBegin( Pinch pinch );
+            void onMove( Pinch pinch );
+            void onEnd( Pinch pinch );
+        }
+    }
+
+    public static class Pan {
+        private Listener listener;
+        private PointF delta = new PointF(0,0);
+
+        public void on( Common common ) {
+        }
+
+        public PointF getDelta() {
+            return delta;
+        }
+
+        void set( Listener listener ) {
+            this.listener = listener;
+        }
+
+        public interface Listener {
+            void onBegin( Pan pan );
+            void onMove( Pan pan );
+            void onEnd( Pan pan );
+        }
     }
 }
