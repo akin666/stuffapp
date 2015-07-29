@@ -27,7 +27,14 @@ public class GestureDetection {
     public PointF delta = new PointF(0,0);
 
     public PointF start = new PointF(0,0);
+    public PointF middle = new PointF(0,0);
 
+    private int count = 0;
+/*
+    private PointF[] points = new PointF[10];
+    private int[] pointsID = new int[10];
+    private int iter = 0;
+*/
     private float scaleDistance;
 
     private float angle;
@@ -83,19 +90,68 @@ public class GestureDetection {
     }
 
     public boolean onTouchEvent(MotionEvent event){
-
+        count = event.getPointerCount();
         final int action = event.getActionMasked();
+
+        final int index = event.getActionIndex();
+        final int id = event.getPointerId(index):
+
         switch( action ) {
-            case MotionEvent.ACTION_POINTER_DOWN:
-            case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_MOVE:
-            case MotionEvent.ACTION_DOWN:
-            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_POINTER_DOWN: {
+                middle = getMiddle(event);
+                break;
+            }
+            case MotionEvent.ACTION_POINTER_UP: {
+                middle = getMiddle(event , index);
+                count -= 1;
+                break;
+            }
+            case MotionEvent.ACTION_DOWN: {
+                getRawPoint(event, id, middle);
+                start.set(middle);
+                break;
+            }
             case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL: {
+                getRawPoint(event, id, middle);
+                count = 0;
+                break;
+            }
             default:
                 break;
         }
 
+        switch( action ) {
+            case MotionEvent.ACTION_MOVE: {
+                panDetection.move(this);
+                pinchDetection.move(this);
+                rotateDetection.move(this);
+                break;
+            }
+            case MotionEvent.ACTION_POINTER_DOWN:
+            case MotionEvent.ACTION_DOWN: {
+                panDetection.begin(this);
+                pinchDetection.begin(this);
+                rotateDetection.begin(this);
+                break;
+            }
+            case MotionEvent.ACTION_POINTER_UP:
+            case MotionEvent.ACTION_UP: {
+                panDetection.end(this);
+                pinchDetection.end(this);
+                rotateDetection.end(this);
+                break;
+            }
+            case MotionEvent.ACTION_CANCEL: {
+                panDetection.cancel(this);
+                pinchDetection.cancel(this);
+                rotateDetection.cancel(this);
+                break;
+            }
+            default:
+                break;
+        }
 
 
 
@@ -339,6 +395,9 @@ public class GestureDetection {
         private Listener listener;
         private float angle;
 
+        public void cancel( GestureDetection detection ) {
+        }
+
         public void begin( GestureDetection detection ) {
         }
 
@@ -357,6 +416,7 @@ public class GestureDetection {
         }
 
         public interface Listener {
+            void onCancel( Rotate rotate );
             void onBegin( Rotate rotate );
             void onMove( Rotate rotate );
             void onEnd( Rotate rotate );
@@ -366,6 +426,9 @@ public class GestureDetection {
     public static class Pinch {
         private Listener listener;
         private float scale;
+
+        public void cancel( GestureDetection detection ) {
+        }
 
         public void begin( GestureDetection detection ) {
         }
@@ -385,6 +448,7 @@ public class GestureDetection {
         }
 
         public interface Listener {
+            void onCancel( Pinch pinch );
             void onBegin( Pinch pinch );
             void onMove( Pinch pinch );
             void onEnd( Pinch pinch );
@@ -394,6 +458,9 @@ public class GestureDetection {
     public static class Pan {
         private Listener listener;
         private PointF delta = new PointF(0,0);
+
+        public void cancel( GestureDetection detection ) {
+        }
 
         public void begin( GestureDetection detection ) {
         }
@@ -413,6 +480,7 @@ public class GestureDetection {
         }
 
         public interface Listener {
+            void onCancel( Pan pan );
             void onBegin( Pan pan );
             void onMove( Pan pan );
             void onEnd( Pan pan );
