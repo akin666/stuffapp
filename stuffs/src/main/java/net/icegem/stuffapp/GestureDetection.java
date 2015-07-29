@@ -94,7 +94,7 @@ public class GestureDetection {
         final int action = event.getActionMasked();
 
         final int index = event.getActionIndex();
-        final int id = event.getPointerId(index):
+        final int id = event.getPointerId(index);
 
         switch( action ) {
             case MotionEvent.ACTION_MOVE:
@@ -104,7 +104,7 @@ public class GestureDetection {
             }
             case MotionEvent.ACTION_POINTER_UP: {
                 middle = getMiddle(event , index);
-                count -= 1;
+                --count;
                 break;
             }
             case MotionEvent.ACTION_DOWN: {
