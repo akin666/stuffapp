@@ -96,14 +96,16 @@ public class GestureDetection {
         final int index = event.getActionIndex();
         final int id = event.getPointerId(index);
 
-        switch( action ) {
+        Log.w(Constants.AppName, "Count: " + count + " Action: " + action + " index: " + index + " id: " + id );
+
+        switch (action) {
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_POINTER_DOWN: {
                 middle = getMiddle(event);
                 break;
             }
             case MotionEvent.ACTION_POINTER_UP: {
-                middle = getMiddle(event , index);
+                middle = getMiddle(event, index);
                 --count;
                 break;
             }
@@ -114,7 +116,8 @@ public class GestureDetection {
             }
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
-                getRawPoint(event, id, middle);
+                // the pointer ended, do not sniff anymore around..
+                //getRawPoint(event, id, middle);
                 count = 0;
                 break;
             }
@@ -153,8 +156,7 @@ public class GestureDetection {
                 break;
         }
 
-
-
+        /*
         final PointF beta;
         if( action == MotionEvent.ACTION_POINTER_UP) {
             beta = getMiddle(event , event.getActionIndex());
@@ -275,6 +277,7 @@ public class GestureDetection {
                 listener.onGesture(this);
             }
         }
+        */
 
         return true;
     }
@@ -411,7 +414,7 @@ public class GestureDetection {
             return angle;
         }
 
-        void set( Listener listener ) {
+        public void set( Listener listener ) {
             this.listener = listener;
         }
 
@@ -428,6 +431,9 @@ public class GestureDetection {
         private float scale;
 
         public void cancel( GestureDetection detection ) {
+            if( listener != null ) {
+                listener.onCancel(this);
+            }
         }
 
         public void begin( GestureDetection detection ) {
@@ -437,13 +443,20 @@ public class GestureDetection {
         }
 
         public void end( GestureDetection detection ) {
+            if( detection.count == 1 ) {
+                if( listener != null ) {
+                    listener.onEnd(this);
+                }
+                return;
+            }
+            //origin.set( detection.middle.x - delta.x , detection.middle.y - delta.y );
         }
 
         public float getScale() {
             return scale;
         }
 
-        void set( Listener listener ) {
+        public void set( Listener listener ) {
             this.listener = listener;
         }
 
@@ -458,24 +471,48 @@ public class GestureDetection {
     public static class Pan {
         private Listener listener;
         private PointF delta = new PointF(0,0);
+        private PointF origin = new PointF(0,0);
 
         public void cancel( GestureDetection detection ) {
+            if( listener != null ) {
+                listener.onCancel(this);
+            }
         }
 
         public void begin( GestureDetection detection ) {
+            if( detection.count == 1 ) {
+                delta.set(0,0);
+                origin.set(detection.middle);
+                if( listener != null ) {
+                    listener.onBegin(this);
+                }
+                return;
+            }
+            origin.set( detection.middle.x - delta.x , detection.middle.y - delta.y );
         }
 
         public void move( GestureDetection detection ) {
+            delta.set( detection.middle.x - origin.x , detection.middle.y - origin.y  );
+            if( listener != null ) {
+                listener.onMove(this);
+            }
         }
 
         public void end( GestureDetection detection ) {
+            if( detection.count == 0 ) {
+                if( listener != null ) {
+                    listener.onEnd(this);
+                }
+                return;
+            }
+            origin.set( detection.middle.x - delta.x , detection.middle.y - delta.y );
         }
 
         public PointF getDelta() {
             return delta;
         }
 
-        void set( Listener listener ) {
+        public void set( Listener listener ) {
             this.listener = listener;
         }
 
