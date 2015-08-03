@@ -27,7 +27,8 @@ import net.icegem.stuffapp.R;
 public class ImageManipulationActivity extends Activity
         implements
         GestureDetection.OnGestureListener ,
-        GestureDetection.Pan.Listener
+        GestureDetection.Pan.Listener,
+        GestureDetection.Pinch.Listener
 {
     private Uri uri;
     private ImageView picture = null;
@@ -38,7 +39,10 @@ public class ImageManipulationActivity extends Activity
     private GestureDetection gestures;
 
     private float scale = 1.0f;
+    private float scaleDelta = 1.0f;
+
     private float rotation = 0.0f;
+    private float rotationDelta = 0.0f;
 
     private Point dimensions = new Point(0,0);
     private PointF offset = new PointF(0,0);
@@ -69,6 +73,7 @@ public class ImageManipulationActivity extends Activity
         gestures = new GestureDetection( this , picture );
 
         gestures.pan().set( this );
+        gestures.pinch().set( this );
 
         bitmap = Helpers.emptyBitMap( dimensions.x , dimensions.y );
 
@@ -85,7 +90,7 @@ public class ImageManipulationActivity extends Activity
         super.onWindowFocusChanged(hasFocus);
 
         if( hasFocus ) {
-            calculateMatrix(0.0f, 1.0f);
+            calculateMatrix();
         }
     }
 
@@ -110,33 +115,32 @@ public class ImageManipulationActivity extends Activity
 
     public void reset(View view) {
         scale = 1.0f;
-        rotation = 0.0f;
-        offset.set(0 , 0);
+        scaleDelta = 1.0f;
 
-        calculateMatrix(0.0f, 1.0f);
+        rotation = 0.0f;
+        rotationDelta = 0.0f;
+
+        offset.set(0,0);
+        offsetDelta.set(0,0);
+
+        calculateMatrix();
     }
 
     public void dismiss(View view) {
         finish();
     }
 
-    public void calculateMatrix( float aRotation , float aScale) {
+    public void calculateMatrix() {
 
         int w = picture.getWidth();
         int h = picture.getHeight();
 
         Matrix matrix = new Matrix();
 
-        float angle = aRotation + this.rotation;
-        float scale = aScale * this.scale;
-
-        if( scale < (-Float.MAX_VALUE) ) {
-            scale = -Float.MAX_VALUE;
-        }
-
+        float tscale = scaleDelta * scale;
         matrix.postTranslate(-dimensions.x / 2.0f, -dimensions.y / 2.0f);
-        matrix.postRotate(angle);
-        matrix.postScale(scale, scale);
+        matrix.postRotate(rotationDelta + rotation);
+        matrix.postScale(tscale, tscale);
 
         matrix.postTranslate(w / 2.0f, h / 2.0f);
         matrix.postTranslate(offset.x + offsetDelta.x, offset.y + offsetDelta.y);
@@ -216,7 +220,7 @@ public class ImageManipulationActivity extends Activity
         offsetDelta.x = delta.x;
         offsetDelta.y = delta.y;
 
-        calculateMatrix(0.0f , 1.0f);
+        calculateMatrix();
     }
 
     @Override
@@ -227,6 +231,29 @@ public class ImageManipulationActivity extends Activity
 
         offsetDelta.set(0,0);
 
-        calculateMatrix(0.0f , 1.0f);
+        calculateMatrix();
+    }
+
+    @Override
+    public void onCancel(GestureDetection.Pinch pinch) {
+    }
+
+    @Override
+    public void onBegin(GestureDetection.Pinch pinch) {
+    }
+
+    @Override
+    public void onMove(GestureDetection.Pinch pinch) {
+        scaleDelta = pinch.getDelta();
+
+        calculateMatrix();
+    }
+
+    @Override
+    public void onEnd(GestureDetection.Pinch pinch) {
+        scale *= pinch.getDelta();
+        scaleDelta = 1.0f;
+
+        calculateMatrix();
     }
 }

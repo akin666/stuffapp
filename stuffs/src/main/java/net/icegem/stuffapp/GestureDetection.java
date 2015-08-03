@@ -360,8 +360,9 @@ public class GestureDetection {
     private float getLengthBetweenPoints(MotionEvent ev) {
         int count = ev.getPointerCount();
         float length = 0.0f;
+
         // We skip one point at least, minimum we need 2 points to do calculations
-        if( count <= 2 ) {
+        if( count < 2 ) {
             return length;
         }
 
@@ -374,20 +375,18 @@ public class GestureDetection {
         point.y = ev.getY(iter);
         ++iter;
 
-        first.x = point.x;
-        first.y = point.y;
+        first.set(point);
 
         for (; iter < count; ++iter) {
             current.x = ev.getX(iter);
             current.y = ev.getY(iter);
 
-            length += PointF.length(current.x - point.x, current.y - point.y);
+            length += distanceBetween(current, point);
 
-            point.x = current.x;
-            point.y = current.y;
+            point.set(current);
         }
 
-        length += PointF.length(point.x - first.x, point.y - first.y);
+        length += distanceBetween(first, point);
 
         return length;
     }
@@ -395,8 +394,10 @@ public class GestureDetection {
     private float getLengthBetweenPoints(MotionEvent ev , int skipIndex) {
         int count = ev.getPointerCount();
         float length = 0.0f;
+
         // We skip one point at least, minimum we need 2 points to do calculations
-        if( count <= 2 ) {
+        // so for this, minimum is 3 points.
+        if( count < 3 ) {
             return length;
         }
 
@@ -415,8 +416,7 @@ public class GestureDetection {
         }
         ++iter;
 
-        first.x = point.x;
-        first.y = point.y;
+        first.set(point);
 
         for (; iter < count; ++iter) {
             if( iter == skipIndex ) {
@@ -426,13 +426,12 @@ public class GestureDetection {
             current.x = ev.getX(iter);
             current.y = ev.getY(iter);
 
-            length += PointF.length(current.x - point.x, current.y - point.y);
+            length += distanceBetween(current, point);
 
-            point.x = current.x;
-            point.y = current.y;
+            point.set(current);
         }
 
-        length += PointF.length(point.x - first.x, point.y - first.y);
+        length += distanceBetween(first, point);
 
         return length;
     }
@@ -466,8 +465,8 @@ public class GestureDetection {
         return -angle;
     }
 
-    private float distanceBetweenPoints(PointF point1, PointF point2) {
-        return PointF.length(point1.x - point2.x , point1.y - point2.y);
+    private float distanceBetween(PointF point1, PointF point2) {
+        return PointF.length(Math.abs(point1.x - point2.x) , Math.abs(point1.y - point2.y));
     }
 
     public interface OnGestureListener {
@@ -494,7 +493,7 @@ public class GestureDetection {
         public void end( GestureDetection detection ) {
         }
 
-        public float getAngle() {
+        public float getDelta() {
             return angle;
         }
 
@@ -515,24 +514,40 @@ public class GestureDetection {
      */
     public static class Pinch {
         private Listener listener;
-        private float scale;
+        private float scale = 1.0f;
         private float distance = 0.0f;
 
         public void cancel( GestureDetection detection ) {
             if( listener != null ) {
                 listener.onCancel(this);
             }
+            scale = 1.0f;
         }
 
         public void begin( GestureDetection detection ) {
             if( detection.count < 2 ) {
                 return;
             }
+            else if( detection.count == 2 ) {
+                scale = 1.0f;
+            }
 
+            if( scale < (-Float.MAX_VALUE) ) {
+                distance = Float.MAX_VALUE;
+                return;
+            }
             distance = detection.distance * (1.0f / scale);
         }
 
         public void move( GestureDetection detection ) {
+            if( detection.count < 2 ) {
+                return;
+            }
+
+            scale = detection.distance / distance;
+            if( listener != null ) {
+                listener.onMove(this);
+            }
         }
 
         public void end( GestureDetection detection ) {
@@ -542,10 +557,15 @@ public class GestureDetection {
                 }
                 return;
             }
-            //origin.set( detection.middle.x - delta.x , detection.middle.y - delta.y );
+
+            if( scale < (-Float.MAX_VALUE) ) {
+                distance = Float.MAX_VALUE;
+                return;
+            }
+            distance = detection.distance * (1.0f / scale);
         }
 
-        public float getScale() {
+        public float getDelta() {
             return scale;
         }
 
