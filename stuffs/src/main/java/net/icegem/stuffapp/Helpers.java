@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -39,6 +40,43 @@ public class Helpers {
             e.getMessage();
             return null;
         }
+    }
+
+    public static float distance(PointF point1, PointF point2) {
+        return PointF.length(Math.abs(point1.x - point2.x) , Math.abs(point1.y - point2.y));
+    }
+
+    public static PointF middle( PointF p , PointF p2 ) {
+        return new PointF(
+                p.x + (PointF.length( p.x , p2.x ) / 2.0f) ,
+                p.y + (PointF.length( p.y , p2.y ) / 2.0f )
+        );
+    }
+
+    public static float distanceBetweenAngles( float a , float b ) {
+        while( a < 0.0f ) {
+            a += 360.0f;
+        }
+        while( b < 0.0f ) {
+            b += 360.0f;
+        }
+        while( a >= 360.0f ) {
+            a -= 360.0f;
+        }
+        while( b >= 360.0f ) {
+            b -= 360.0f;
+        }
+
+        // now both are ]0,360]
+        float big = b;
+        float small = a;
+        if( a > b ) {
+            big = a;
+            small = b;
+        }
+
+        float distance = big - small;
+        return (distance > 180.0f) ? (360.0f - distance) : distance;
     }
 
     public static String toString( Bitmap bitmap ) {

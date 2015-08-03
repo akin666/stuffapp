@@ -26,7 +26,6 @@ import net.icegem.stuffapp.R;
 
 public class ImageManipulationActivity extends Activity
         implements
-        GestureDetection.OnGestureListener ,
         GestureDetection.Pan.Listener,
         GestureDetection.Pinch.Listener
 {
@@ -70,7 +69,7 @@ public class ImageManipulationActivity extends Activity
         picture.setScaleType(ImageView.ScaleType.MATRIX);
         picture.setAdjustViewBounds(false);
 
-        gestures = new GestureDetection( this , picture );
+        gestures = new GestureDetection( picture );
 
         gestures.pan().set( this );
         gestures.pinch().set( this );
@@ -165,6 +164,7 @@ public class ImageManipulationActivity extends Activity
         return gestures.onTouchEvent(event);
     }
 
+    /*
     @Override
     public void beginGesture(GestureDetection detection) {
     }
@@ -175,15 +175,12 @@ public class ImageManipulationActivity extends Activity
 
     @Override
     public void onGesture(GestureDetection detection) {
-        /*
         PointF delta = detection.getMoveDelta();
         calculateMatrix(detection.getAngle(), detection.getScale() , delta.x , delta.y );
-        */
     }
 
     @Override
     public void endGesture(GestureDetection detection) {
-        /*
         rotation += detection.getAngle();
         scale *= detection.getScale();
 
@@ -191,18 +188,16 @@ public class ImageManipulationActivity extends Activity
             scale = -Float.MAX_VALUE;
         }
         calculateMatrix(0.0f, 1.0f, 0.0f , 0.0f);
-        */
     }
 
     @Override
     public void endMove(GestureDetection detection) {
-        /*
         PointF delta = detection.getMoveDelta();
         offset.x += delta.x;
         offset.y += delta.y;
         calculateMatrix(0.0f, 1.0f, 0.0f , 0.0f);
-        */
     }
+    */
 
     @Override
     public void onCancel(GestureDetection.Pan pan) {
