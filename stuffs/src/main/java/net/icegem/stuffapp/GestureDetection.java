@@ -18,18 +18,9 @@ public class GestureDetection {
     private Pinch pinchDetection = new Pinch();
     private Rotate rotateDetection = new Rotate();
 
-    private PointF point1 = new PointF();
-    private PointF point2 = new PointF();
-
-    private int ptrID1, ptrID2;
-
-    public PointF origin = new PointF(0,0);
-    public PointF delta = new PointF(0,0);
-
-    public PointF start = new PointF(0,0);
-    public PointF middle = new PointF(0,0);
-
-    public float distance = 0.0f;
+    private PointF start = new PointF(0,0);
+    private PointF middle = new PointF(0,0);
+    private PointF rawMiddle = new PointF(0,0);
 
     private int count = 0;
 /*
@@ -37,29 +28,16 @@ public class GestureDetection {
     private int[] pointsID = new int[10];
     private int iter = 0;
 */
-    private float scaleDistance;
-
     private float angle;
-    private float scale;
 
     private View view;
-
-    private OnGestureListener listener;
 
     public float getAngle() {
         return angle;
     }
 
-    public float getScale() {
-        return scale;
-    }
-
     public PointF getPoint() {
-        return origin;
-    }
-
-    public PointF getMoveDelta() {
-        return delta;
+        return start;
     }
 
     public Pan pan() {
@@ -74,55 +52,34 @@ public class GestureDetection {
         return rotateDetection;
     }
 
-    public GestureDetection(OnGestureListener listener, View view) {
+    public GestureDetection(View view) {
         this.angle = 0.0f;
-        this.scale = 1.0f;
-        delta.x = 0;
-        delta.y = 0;
 
-        this.listener = listener;
         this.view = view;
-    }
-
-    public void reset() {
-        this.angle = 0.0f;
-        this.scale = 1.0f;
-        delta.x = 0;
-        delta.y = 0;
     }
 
     public boolean onTouchEvent(MotionEvent event){
         count = event.getPointerCount();
-        final int action = event.getActionMasked();
 
+        final int action = event.getActionMasked();
         final int index = event.getActionIndex();
         final int id = event.getPointerId(index);
 
         Log.w(Constants.AppName, "Count: " + count + " Action: " + action + " index: " + index + " id: " + id );
 
+        rawMiddle = getMiddle(event);
+        middle = transformToScreen(rawMiddle);
         switch (action) {
-            case MotionEvent.ACTION_MOVE:
-            case MotionEvent.ACTION_POINTER_DOWN: {
-                middle = getMiddle(event);
-                distance = getLengthBetweenPoints(event);
-                break;
-            }
             case MotionEvent.ACTION_POINTER_UP: {
-                middle = getMiddle(event, index);
-                distance = getLengthBetweenPoints(event, index);
                 --count;
                 break;
             }
             case MotionEvent.ACTION_DOWN: {
-                getRawPoint(event, id, middle);
                 start.set(middle);
-                distance = 0.0f;
                 break;
             }
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
-                // the pointer ended, do not sniff anymore around..
-                //getRawPoint(event, id, middle);
                 count = 0;
                 break;
             }
@@ -132,29 +89,29 @@ public class GestureDetection {
 
         switch( action ) {
             case MotionEvent.ACTION_MOVE: {
-                panDetection.move(this);
-                pinchDetection.move(this);
-                rotateDetection.move(this);
+                panDetection.move(this, event);
+                pinchDetection.move(this, event);
+                rotateDetection.move(this, event);
                 break;
             }
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN: {
-                panDetection.begin(this);
-                pinchDetection.begin(this);
-                rotateDetection.begin(this);
+                panDetection.begin(this, event);
+                pinchDetection.begin(this, event);
+                rotateDetection.begin(this, event);
                 break;
             }
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_UP: {
-                panDetection.end(this);
-                pinchDetection.end(this);
-                rotateDetection.end(this);
+                panDetection.end(this, event);
+                pinchDetection.end(this, event);
+                rotateDetection.end(this, event);
                 break;
             }
             case MotionEvent.ACTION_CANCEL: {
-                panDetection.cancel(this);
-                pinchDetection.cancel(this);
-                rotateDetection.cancel(this);
+                panDetection.cancel(this, event);
+                pinchDetection.cancel(this, event);
+                rotateDetection.cancel(this, event);
                 break;
             }
             default:
@@ -287,153 +244,53 @@ public class GestureDetection {
         return true;
     }
 
-    private PointF getMiddle( PointF p , PointF p2 ) {
-        return new PointF(
-                p.x + (PointF.length( p.x , p2.x ) / 2.0f) ,
-                p.y + (PointF.length( p.y , p2.y ) / 2.0f )
-        );
+    private PointF getMiddle(MotionEvent event) {
+        PointF point = getRawMiddle(event);
+        return transformToScreen(point);
     }
 
-    private PointF getMiddle( MotionEvent ev ) {
+    private PointF getRawMiddle(MotionEvent event) {
+        final int count = event.getPointerCount();
+        final int action = event.getActionMasked();
+        final int index = event.getActionIndex();
+
         PointF point = new PointF(0,0);
-        final int[] location = { 0, 0 };
-        view.getLocationOnScreen(location);
 
-        int count = ev.getPointerCount();
-        for (int i = 0; i < count; ++i) {
-            float x = ev.getX(i);
-            float y = ev.getY(i);
-
-            double angle = Math.toDegrees(Math.atan2(y, x));
-            angle += view.getRotation();
-
-            final float length = PointF.length(x, y);
-
-            x = (float) (length * Math.cos(Math.toRadians(angle))) + location[0];
-            y = (float) (length * Math.sin(Math.toRadians(angle))) + location[1];
-
-            point.x += x;
-            point.y += y;
+        int skip = -1;
+        if( action == MotionEvent.ACTION_POINTER_UP ) {
+            skip = index;
         }
 
-        point.x /= count;
-        point.y /= count;
+        int counter = 0;
+        for (int i = 0; i < count; ++i) {
+            if( i == skip ) {
+                continue;
+            }
+
+            point.x += event.getX(i);
+            point.y += event.getY(i);
+            ++counter;
+        }
+
+        if( counter != 0 ) {
+            point.x /= counter;
+            point.y /= counter;
+        }
 
         return point;
     }
 
-    private PointF getMiddle(MotionEvent ev , int skipIndex) {
-        PointF point = new PointF(0,0);
-        int count = ev.getPointerCount();
+    private PointF transformToScreen(PointF point) {
         final int[] location = { 0, 0 };
         view.getLocationOnScreen(location);
 
-        if( count <= 1 ) {
-            return point;
-        }
+        // Transform:
+        double angle = Math.toDegrees(Math.atan2(point.y, point.x));
+        angle += view.getRotation();
 
-        for (int i = 0; i < count; ++i) {
-            if( i == skipIndex ) {
-                continue;
-            }
+        final float length = PointF.length(point.x, point.y);
 
-            float x = ev.getX(i);
-            float y = ev.getY(i);
-
-            double angle = Math.toDegrees(Math.atan2(y, x));
-            angle += view.getRotation();
-
-            final float length = PointF.length(x, y);
-
-            x = (float) (length * Math.cos(Math.toRadians(angle))) + location[0];
-            y = (float) (length * Math.sin(Math.toRadians(angle))) + location[1];
-
-            point.x += x;
-            point.y += y;
-        }
-
-        point.x /= (count - 1);
-        point.y /= (count - 1);
-
-        return point;
-    }
-    private float getLengthBetweenPoints(MotionEvent ev) {
-        int count = ev.getPointerCount();
-        float length = 0.0f;
-
-        // We skip one point at least, minimum we need 2 points to do calculations
-        if( count < 2 ) {
-            return length;
-        }
-
-        PointF first = new PointF(0,0);
-        PointF current = new PointF(0,0);
-        PointF point = new PointF(0,0);
-
-        int iter = 0;
-        point.x = ev.getX(iter);
-        point.y = ev.getY(iter);
-        ++iter;
-
-        first.set(point);
-
-        for (; iter < count; ++iter) {
-            current.x = ev.getX(iter);
-            current.y = ev.getY(iter);
-
-            length += distanceBetween(current, point);
-
-            point.set(current);
-        }
-
-        length += distanceBetween(first, point);
-
-        return length;
-    }
-
-    private float getLengthBetweenPoints(MotionEvent ev , int skipIndex) {
-        int count = ev.getPointerCount();
-        float length = 0.0f;
-
-        // We skip one point at least, minimum we need 2 points to do calculations
-        // so for this, minimum is 3 points.
-        if( count < 3 ) {
-            return length;
-        }
-
-        PointF first = new PointF(0,0);
-        PointF current = new PointF(0,0);
-        PointF point = new PointF(0,0);
-
-        int iter = 0;
-        if( iter != skipIndex ) {
-            point.x = ev.getX(iter);
-            point.y = ev.getY(iter);
-        } else {
-            ++iter;
-            point.x = ev.getX(iter);
-            point.y = ev.getY(iter);
-        }
-        ++iter;
-
-        first.set(point);
-
-        for (; iter < count; ++iter) {
-            if( iter == skipIndex ) {
-                continue;
-            }
-
-            current.x = ev.getX(iter);
-            current.y = ev.getY(iter);
-
-            length += distanceBetween(current, point);
-
-            point.set(current);
-        }
-
-        length += distanceBetween(first, point);
-
-        return length;
+        return new PointF((float) (length * Math.cos(Math.toRadians(angle))) + location[0] , (float) (length * Math.sin(Math.toRadians(angle))) + location[1]);
     }
 
     void getRawPoint(MotionEvent ev, int index, PointF point){
@@ -465,36 +322,71 @@ public class GestureDetection {
         return -angle;
     }
 
-    private float distanceBetween(PointF point1, PointF point2) {
-        return PointF.length(Math.abs(point1.x - point2.x) , Math.abs(point1.y - point2.y));
-    }
-
-    public interface OnGestureListener {
-        void beginMove(GestureDetection detection );
-        void beginGesture(GestureDetection detection );
-        void onGesture(GestureDetection detection );
-        void endGesture(GestureDetection detection );
-        void endMove(GestureDetection detection );
-    }
-
     public static class Rotate {
         private Listener listener;
-        private float angle;
+        private int[] trackID = new int[10];
+        private float[] trackAngle = new float[10];
+        private float delta = 0.0f;
+        private int iterator = 0;
 
-        public void cancel( GestureDetection detection ) {
+        private int findIDIndex(int id) {
+            for( int i = 0 ; i < iterator ; ++i ) {
+                if( trackID[i] == id ) {
+                    return i;
+                }
+            }
+            return -1;
         }
 
-        public void begin( GestureDetection detection ) {
+        private void setupAngle(PointF middle, float x, float y, int id, int index) {
+            float angle = (float) Math.toDegrees(Math.atan2(y - middle.y , x - middle.x));
+            if(angle < 0.0f){
+                angle += 360.0f;
+            }
+
+            trackAngle[index] = angle;
+            trackID[index] = id;
         }
 
-        public void move( GestureDetection detection ) {
+        private void updateAngle(PointF middle, float x, float y, int index) {
+            float angle = (float) Math.toDegrees(Math.atan2(y - middle.y , x - middle.x));
+            if(angle < 0.0f){
+                angle += 360.0f;
+            }
+
+            trackAngle[index] = angle - delta;
         }
 
-        public void end( GestureDetection detection ) {
+        public void cancel( GestureDetection detection , MotionEvent event ) {
+            delta = 0.0f;
+            if( listener != null ) {
+                listener.onCancel(this);
+            }
+        }
+
+        public void begin( GestureDetection detection , MotionEvent event ) {
+            if( detection.count < 2 ) {
+                return;
+            }
+            else if( detection.count == 2 ) {
+                delta = 0.0f;
+
+                if( listener != null ) {
+                    listener.onBegin(this);
+                }
+            }
+
+            //distance = getDistance(event) * (1.0f / scale);
+        }
+
+        public void move( GestureDetection detection , MotionEvent event ) {
+        }
+
+        public void end( GestureDetection detection , MotionEvent event ) {
         }
 
         public float getDelta() {
-            return angle;
+            return delta;
         }
 
         public void set( Listener listener ) {
@@ -515,42 +407,114 @@ public class GestureDetection {
     public static class Pinch {
         private Listener listener;
         private float scale = 1.0f;
+
         private float distance = 0.0f;
 
-        public void cancel( GestureDetection detection ) {
+        private float getDistance(MotionEvent event) {
+            final int count = event.getPointerCount();
+            final int action = event.getActionMasked();
+            final int index = event.getActionIndex();
+
+            if( count < 2 ) {
+                return 0.0f;
+            }
+
+            float length = 0.0f;
+            PointF first = new PointF(0,0);
+            PointF current = new PointF(0,0);
+            PointF point = new PointF(0,0);
+
+            int iter = 0;
+            if( action == MotionEvent.ACTION_POINTER_UP ) {
+                // skip one point..
+                if( count < 3 ) {
+                    return 0.0f;
+                }
+
+                if( iter != index ) {
+                    point.x = event.getX(iter);
+                    point.y = event.getY(iter);
+                } else {
+                    ++iter;
+                    point.x = event.getX(iter);
+                    point.y = event.getY(iter);
+                }
+                ++iter;
+
+                first.set(point);
+
+                for (; iter < count; ++iter) {
+                    if( iter == index ) {
+                        continue;
+                    }
+
+                    current.x = event.getX(iter);
+                    current.y = event.getY(iter);
+
+                    length += Helpers.distance(current, point);
+
+                    point.set(current);
+                }
+            }
+            else {
+                point.x = event.getX(iter);
+                point.y = event.getY(iter);
+                ++iter;
+
+                first.set(point);
+                for (; iter < count; ++iter) {
+                    current.x = event.getX(iter);
+                    current.y = event.getY(iter);
+
+                    length += Helpers.distance(current, point);
+
+                    point.set(current);
+                }
+            }
+
+            length += Helpers.distance(first, point);
+
+            return length;
+        }
+
+        public void cancel( GestureDetection detection , MotionEvent event ) {
+            scale = 1.0f;
             if( listener != null ) {
                 listener.onCancel(this);
             }
-            scale = 1.0f;
         }
 
-        public void begin( GestureDetection detection ) {
+        public void begin( GestureDetection detection , MotionEvent event ) {
             if( detection.count < 2 ) {
                 return;
             }
             else if( detection.count == 2 ) {
                 scale = 1.0f;
+
+                if( listener != null ) {
+                    listener.onBegin(this);
+                }
             }
 
             if( scale < (-Float.MAX_VALUE) ) {
                 distance = Float.MAX_VALUE;
                 return;
             }
-            distance = detection.distance * (1.0f / scale);
+            distance = getDistance(event) * (1.0f / scale);
         }
 
-        public void move( GestureDetection detection ) {
+        public void move( GestureDetection detection , MotionEvent event ) {
             if( detection.count < 2 ) {
                 return;
             }
 
-            scale = detection.distance / distance;
+            scale = getDistance(event) / distance;
             if( listener != null ) {
                 listener.onMove(this);
             }
         }
 
-        public void end( GestureDetection detection ) {
+        public void end( GestureDetection detection , MotionEvent event ) {
             if( detection.count == 1 ) {
                 if( listener != null ) {
                     listener.onEnd(this);
@@ -562,7 +526,7 @@ public class GestureDetection {
                 distance = Float.MAX_VALUE;
                 return;
             }
-            distance = detection.distance * (1.0f / scale);
+            distance = getDistance(event) * (1.0f / scale);
         }
 
         public float getDelta() {
@@ -586,13 +550,13 @@ public class GestureDetection {
         private PointF delta = new PointF(0,0);
         private PointF origin = new PointF(0,0);
 
-        public void cancel( GestureDetection detection ) {
+        public void cancel( GestureDetection detection , MotionEvent event ) {
             if( listener != null ) {
                 listener.onCancel(this);
             }
         }
 
-        public void begin( GestureDetection detection ) {
+        public void begin( GestureDetection detection, MotionEvent event ) {
             if( detection.count == 1 ) {
                 delta.set(0,0);
                 origin.set(detection.middle);
@@ -604,14 +568,14 @@ public class GestureDetection {
             origin.set( detection.middle.x - delta.x , detection.middle.y - delta.y );
         }
 
-        public void move( GestureDetection detection ) {
+        public void move( GestureDetection detection , MotionEvent event ) {
             delta.set( detection.middle.x - origin.x , detection.middle.y - origin.y  );
             if( listener != null ) {
                 listener.onMove(this);
             }
         }
 
-        public void end( GestureDetection detection ) {
+        public void end( GestureDetection detection , MotionEvent event ) {
             if( detection.count == 0 ) {
                 if( listener != null ) {
                     listener.onEnd(this);
