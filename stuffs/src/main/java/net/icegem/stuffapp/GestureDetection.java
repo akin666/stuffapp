@@ -29,6 +29,8 @@ public class GestureDetection {
     public PointF start = new PointF(0,0);
     public PointF middle = new PointF(0,0);
 
+    public float distance = 0.0f;
+
     private int count = 0;
 /*
     private PointF[] points = new PointF[10];
@@ -102,16 +104,19 @@ public class GestureDetection {
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_POINTER_DOWN: {
                 middle = getMiddle(event);
+                distance = getLengthBetweenPoints(event);
                 break;
             }
             case MotionEvent.ACTION_POINTER_UP: {
                 middle = getMiddle(event, index);
+                distance = getLengthBetweenPoints(event, index);
                 --count;
                 break;
             }
             case MotionEvent.ACTION_DOWN: {
                 getRawPoint(event, id, middle);
                 start.set(middle);
+                distance = 0.0f;
                 break;
             }
             case MotionEvent.ACTION_UP:
@@ -352,6 +357,85 @@ public class GestureDetection {
 
         return point;
     }
+    private float getLengthBetweenPoints(MotionEvent ev) {
+        int count = ev.getPointerCount();
+        float length = 0.0f;
+        // We skip one point at least, minimum we need 2 points to do calculations
+        if( count <= 2 ) {
+            return length;
+        }
+
+        PointF first = new PointF(0,0);
+        PointF current = new PointF(0,0);
+        PointF point = new PointF(0,0);
+
+        int iter = 0;
+        point.x = ev.getX(iter);
+        point.y = ev.getY(iter);
+        ++iter;
+
+        first.x = point.x;
+        first.y = point.y;
+
+        for (; iter < count; ++iter) {
+            current.x = ev.getX(iter);
+            current.y = ev.getY(iter);
+
+            length += PointF.length(current.x - point.x, current.y - point.y);
+
+            point.x = current.x;
+            point.y = current.y;
+        }
+
+        length += PointF.length(point.x - first.x, point.y - first.y);
+
+        return length;
+    }
+
+    private float getLengthBetweenPoints(MotionEvent ev , int skipIndex) {
+        int count = ev.getPointerCount();
+        float length = 0.0f;
+        // We skip one point at least, minimum we need 2 points to do calculations
+        if( count <= 2 ) {
+            return length;
+        }
+
+        PointF first = new PointF(0,0);
+        PointF current = new PointF(0,0);
+        PointF point = new PointF(0,0);
+
+        int iter = 0;
+        if( iter != skipIndex ) {
+            point.x = ev.getX(iter);
+            point.y = ev.getY(iter);
+        } else {
+            ++iter;
+            point.x = ev.getX(iter);
+            point.y = ev.getY(iter);
+        }
+        ++iter;
+
+        first.x = point.x;
+        first.y = point.y;
+
+        for (; iter < count; ++iter) {
+            if( iter == skipIndex ) {
+                continue;
+            }
+
+            current.x = ev.getX(iter);
+            current.y = ev.getY(iter);
+
+            length += PointF.length(current.x - point.x, current.y - point.y);
+
+            point.x = current.x;
+            point.y = current.y;
+        }
+
+        length += PointF.length(point.x - first.x, point.y - first.y);
+
+        return length;
+    }
 
     void getRawPoint(MotionEvent ev, int index, PointF point){
         final int[] location = { 0, 0 };
@@ -426,9 +510,13 @@ public class GestureDetection {
         }
     }
 
+    /**
+     * At least 2 points, indicating a
+     */
     public static class Pinch {
         private Listener listener;
         private float scale;
+        private float distance = 0.0f;
 
         public void cancel( GestureDetection detection ) {
             if( listener != null ) {
@@ -437,6 +525,11 @@ public class GestureDetection {
         }
 
         public void begin( GestureDetection detection ) {
+            if( detection.count < 2 ) {
+                return;
+            }
+
+            distance = detection.distance * (1.0f / scale);
         }
 
         public void move( GestureDetection detection ) {
