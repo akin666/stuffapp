@@ -210,7 +210,7 @@ public class ImageManipulationActivity extends Activity
 
     @Override
     public void onBegin(GestureDetection.Pan pan) {
-
+        offsetDelta.set(0,0);
     }
 
     @Override
@@ -242,6 +242,7 @@ public class ImageManipulationActivity extends Activity
 
     @Override
     public void onBegin(GestureDetection.Pinch pinch) {
+        scaleDelta = 1.0f;
     }
 
     @Override
@@ -268,7 +269,7 @@ public class ImageManipulationActivity extends Activity
 
     @Override
     public void onBegin(GestureDetection.Rotate rotate) {
-
+        rotationDelta = 0.0f;
     }
 
     @Override

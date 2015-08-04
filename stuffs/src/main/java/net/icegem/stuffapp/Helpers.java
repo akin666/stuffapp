@@ -43,7 +43,11 @@ public class Helpers {
     }
 
     public static float distance(PointF point1, PointF point2) {
-        return PointF.length(Math.abs(point1.x - point2.x) , Math.abs(point1.y - point2.y));
+        return PointF.length(Math.abs(point1.x - point2.x), Math.abs(point1.y - point2.y));
+    }
+
+    public static float distance(float a , float b) {
+        return Math.abs(b - a);
     }
 
     public static PointF middle( PointF p , PointF p2 ) {
@@ -62,6 +66,22 @@ public class Helpers {
         }
 
         // now  ]0,360]
+        return angle;
+    }
+
+    public static float inverseAngle( float angle ) {
+        if( angle == 0.0f ) {
+            return 0.0f;
+        }
+        if( angle < 0 ) {
+            while( angle < 0 ) {
+                angle += 360;
+            }
+            return angle;
+        }
+        while( angle > 0 ) {
+            angle -= 360;
+        }
         return angle;
     }
 
