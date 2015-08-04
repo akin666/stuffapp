@@ -65,6 +65,20 @@ public class Helpers {
         return angle;
     }
 
+    public static float shortestDistanceAngle( float angle1 , float angle2 ) {
+        angle1 = clampAngle( angle1 );
+        angle2 = clampAngle( angle2 );
+
+        if( angle1 > angle2 ) {
+            float distance = angle1 - angle2;
+
+            return (distance > 180.0f) ? (360.0f - distance) : (-distance);
+        }
+
+        float distance = angle2 - angle1;
+        return (distance > 180.0f) ? (-(360.0f - distance)) : (distance);
+    }
+
     public static float distanceBetweenAngles( float a , float b ) {
         a = clampAngle(a);
         b = clampAngle(b);

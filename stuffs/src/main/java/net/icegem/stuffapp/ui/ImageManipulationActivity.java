@@ -27,7 +27,8 @@ import net.icegem.stuffapp.R;
 public class ImageManipulationActivity extends Activity
         implements
         GestureDetection.Pan.Listener,
-        GestureDetection.Pinch.Listener
+        GestureDetection.Pinch.Listener,
+        GestureDetection.Rotate.Listener
 {
     private Uri uri;
     private ImageView picture = null;
@@ -73,6 +74,7 @@ public class ImageManipulationActivity extends Activity
 
         gestures.pan().set( this );
         gestures.pinch().set( this );
+        gestures.rotate().set( this );
 
         bitmap = Helpers.emptyBitMap( dimensions.x , dimensions.y );
 
@@ -201,7 +203,9 @@ public class ImageManipulationActivity extends Activity
 
     @Override
     public void onCancel(GestureDetection.Pan pan) {
+        offsetDelta.set(0,0);
 
+        calculateMatrix();
     }
 
     @Override
@@ -231,6 +235,9 @@ public class ImageManipulationActivity extends Activity
 
     @Override
     public void onCancel(GestureDetection.Pinch pinch) {
+        scaleDelta = 1.0f;
+
+        calculateMatrix();
     }
 
     @Override
@@ -248,6 +255,33 @@ public class ImageManipulationActivity extends Activity
     public void onEnd(GestureDetection.Pinch pinch) {
         scale *= pinch.getDelta();
         scaleDelta = 1.0f;
+
+        calculateMatrix();
+    }
+
+    @Override
+    public void onCancel(GestureDetection.Rotate rotate) {
+        rotationDelta = 0.0f;
+
+        calculateMatrix();
+    }
+
+    @Override
+    public void onBegin(GestureDetection.Rotate rotate) {
+
+    }
+
+    @Override
+    public void onMove(GestureDetection.Rotate rotate) {
+        rotationDelta = rotate.getDelta();
+
+        calculateMatrix();
+    }
+
+    @Override
+    public void onEnd(GestureDetection.Rotate rotate) {
+        rotation += rotate.getDelta();
+        rotationDelta = 0.0f;
 
         calculateMatrix();
     }
