@@ -329,6 +329,44 @@ public class GestureDetection {
         private float delta = 0.0f;
         private int iterator = 0;
 
+        private void swap( int a , int b ) {
+            if( a == b ) {
+                return;
+            }
+            int id = trackID[b];
+            float angle = trackAngle[b];
+
+            trackID[b] = trackID[a];
+            trackAngle[b] = trackAngle[a];
+            trackID[a] = id;
+            trackAngle[a] = angle;
+        }
+
+        private void remove( int id ) {
+            int index = findIDIndex( id );
+            if( index < 0 ) {
+                return;
+            }
+            --iterator;
+            if( index != iterator ) {
+                trackID[index] = trackID[iterator];
+                trackAngle[index] = trackAngle[iterator];
+            }
+        }
+
+        private void add( int id , float angle ) {
+            if( iterator >= trackID.length ) {
+                return;
+            }
+            trackID[iterator] = id;
+            trackAngle[iterator] = angle;
+            ++iterator;
+        }
+
+        private void clear() {
+            iterator = 0;
+        }
+
         private int findIDIndex(int id) {
             for( int i = 0 ; i < iterator ; ++i ) {
                 if( trackID[i] == id ) {
@@ -348,13 +386,15 @@ public class GestureDetection {
             trackID[index] = id;
         }
 
-        private void updateAngle(PointF middle, float x, float y, int index) {
-            float angle = (float) Math.toDegrees(Math.atan2(y - middle.y , x - middle.x));
-            if(angle < 0.0f){
-                angle += 360.0f;
-            }
+        private void updateAngle(PointF middle, float x, float y, int index, float delta) {
+            float angle = getAngle( middle , x , y );
 
-            trackAngle[index] = angle - delta;
+
+        }
+
+        private float getAngle(PointF middle, float x, float y) {
+            float angle = (float) Math.toDegrees(Math.atan2(y - middle.y , x - middle.x));
+            return Helpers.clampAngle(angle);
         }
 
         public void cancel( GestureDetection detection , MotionEvent event ) {
@@ -370,19 +410,48 @@ public class GestureDetection {
             }
             else if( detection.count == 2 ) {
                 delta = 0.0f;
-
                 if( listener != null ) {
                     listener.onBegin(this);
                 }
+
+                // setup all points
+                for( int i = 0 ; i < detection.count ; ++i ) {
+                    float angle = getAngle( detection.rawMiddle , event.getX(i) , event.getY(i) );
+                    add( event.getPointerId(i) , Helpers.clampAngle(angle - delta) );
+                }
+                return;
             }
 
-            //distance = getDistance(event) * (1.0f / scale);
+            int index = event.getActionIndex();
+            float angle = getAngle( detection.rawMiddle , event.getX(index) , event.getY(index) );
+            add( event.getPointerId(index) , Helpers.clampAngle(angle - delta) );
         }
 
         public void move( GestureDetection detection , MotionEvent event ) {
         }
 
         public void end( GestureDetection detection , MotionEvent event ) {
+            if( detection.count == 1 ) {
+                if( listener != null ) {
+                    listener.onEnd(this);
+                }
+                clear();
+                return;
+            }
+
+            // remove the removed ID
+            int index = event.getActionIndex();
+            remove(event.getPointerId(index));
+
+            // update all existing angles
+            int count = event.getPointerCount();
+            for( int i = 0 ; i < count ; ++i ) {
+                if( i == index ) {
+                    continue;
+                }
+            }
+
+            distance = getDistance(event) * (1.0f / scale);
         }
 
         public float getDelta() {
@@ -402,7 +471,7 @@ public class GestureDetection {
     }
 
     /**
-     * At least 2 points, indicating a
+     * At least 2 points, is needed for pinch
      */
     public static class Pinch {
         private Listener listener;
