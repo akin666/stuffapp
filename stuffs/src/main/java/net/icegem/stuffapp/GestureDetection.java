@@ -48,10 +48,6 @@ public class GestureDetection {
         count = event.getPointerCount();
 
         final int action = event.getActionMasked();
-        final int index = event.getActionIndex();
-        final int id = event.getPointerId(index);
-
-        Log.w(Constants.AppName, "Count: " + count + " Action: " + action + " index: " + index + " id: " + id );
 
         rawMiddle = getMiddle(event);
         middle = transformToScreen(rawMiddle);
@@ -157,8 +153,7 @@ public class GestureDetection {
     }
 
     private float getAngle(float x , float y) {
-        float angle = (float) Math.toDegrees(Math.atan2(y - rawMiddle.y , x - rawMiddle.x));
-        return Helpers.clampAngle(angle);
+        return Helpers.clampAngle((float) Math.toDegrees(Math.atan2(y - rawMiddle.y , x - rawMiddle.x)));
     }
 
     public static class Rotate {
@@ -169,7 +164,7 @@ public class GestureDetection {
         private int iterator = 0;
 
         private void remove( int id ) {
-            int index = findIDIndex( id );
+            int index = findID(id);
             if( index < 0 ) {
                 return;
             }
@@ -180,21 +175,17 @@ public class GestureDetection {
             }
         }
 
-        private void add( int id , float angle ) {
+        private int add( int id  ) {
             if( iterator >= trackID.length ) {
-                return;
+                return - 1;
             }
             trackID[iterator] = id;
-            trackAngle[iterator] = angle;
             ++iterator;
+
+            return iterator - 1;
         }
 
-        private void clear() {
-            iterator = 0;
-            delta = 0.0f;
-        }
-
-        private int findIDIndex(int id) {
+        private int findID(int id) {
             for( int i = 0 ; i < iterator ; ++i ) {
                 if( trackID[i] == id ) {
                     return i;
@@ -205,53 +196,113 @@ public class GestureDetection {
 
         public void cancel( GestureDetection detection , MotionEvent event ) {
             delta = 0.0f;
+            iterator = 0;
             if( listener != null ) {
                 listener.onCancel(this);
             }
         }
 
         public void begin( GestureDetection detection , MotionEvent event ) {
-            if( detection.count < 2 ) {
-                return;
-            }
-            else if( detection.count == 2 ) {
+            if( detection.count == 2 ) {
                 delta = 0.0f;
                 if( listener != null ) {
                     listener.onBegin(this);
                 }
-
-                // setup all points
-                for( int i = 0 ; i < detection.count ; ++i ) {
-                    add( event.getPointerId(i) , Helpers.clampAngle(detection.getAngle(event.getX(i), event.getY(i)) - delta) );
-                }
-                return;
             }
 
-            int index = event.getActionIndex();
-            add( event.getPointerId(index) , Helpers.clampAngle(detection.getAngle(event.getX(index), event.getY(index)) - delta) );
+            add(event.getPointerId(event.getActionIndex()));
+
+            // update all angles
+            int count = event.getPointerCount();
+            for( int i = 0 ; i < count ; ++i ) {
+                int idx = findID(event.getPointerId(i));
+                if( idx >= 0 ) {
+                    trackAngle[idx] = Helpers.clampAngle(detection.getAngle(event.getX(i), event.getY(i)) - delta);
+                }
+            }
         }
 
         public void move( GestureDetection detection , MotionEvent event ) {
-            float deltaCollector = 0.0f;
+            int count = event.getPointerCount();
+
+            if( count < 2 ) {
+                delta = 0.0f;
+                return;
+            }
+
+            float negativeCollector = 0.0f;
+            float positiveCollector = 0.0f;
+
+            int negCount = 0;
+            int posCount = 0;
 
             // update all existing angles
-            int counter = 0;
-            int count = event.getPointerCount();
             for( int i = 0 ; i < count ; ++i ) {
-                int idx = findIDIndex(event.getPointerId(i));
+                int idx = findID(event.getPointerId(i));
                 if( idx < 0 )
                 {
                     continue;
                 }
-                deltaCollector += Helpers.shortestDistanceAngle( trackAngle[idx] , detection.getAngle(event.getX(i), event.getY(i)) );
-                ++counter;
+
+                float angle = detection.getAngle(event.getX(i), event.getY(i));
+                float pointDelta = Helpers.shortestDistanceAngle(trackAngle[idx], angle);
+
+                if( pointDelta < 0.0f ) {
+                    ++negCount;
+                    negativeCollector += pointDelta;
+                }
+                else {
+                    ++posCount;
+                    positiveCollector += pointDelta;
+                }
+
+                break;
             }
 
+            int counter = 0;
+            delta = 0.0f;
+            if( negCount > 0 ) {
+                ++counter;
+                delta += Helpers.clampAngle(negativeCollector / negCount);
+            }
+            if( posCount > 0 ) {
+                ++counter;
+                delta += Helpers.clampAngle(positiveCollector / posCount);
+            }
+
+            delta /= counter;
+            /**/
+
+            /*
+            float accumulator = 0.0f;
+            int counter = 0;
+            for( int i = 0 ; i < count ; ++i ) {
+                int idx = findID(event.getPointerId(i));
+                if( idx < 0 )
+                {
+                    continue;
+                }
+
+                float angle = detection.getAngle(event.getX(i), event.getY(i));
+
+                float pointDelta = Helpers.shortestDistanceAngle(trackAngle[idx], angle);
+                float pointDeltaInverse = Helpers.inverseAngle(pointDelta);
+
+                accumulator += pointDelta + pointDeltaInverse;
+
+                counter += 2;
+
+                break;
+            }
+
+
             if( counter > 0 ) {
-                delta = deltaCollector / counter;
-            } else {
+                delta = Helpers.clampAngle((accumulator / counter) + 180.0f);
+            }
+            else {
                 delta = 0.0f;
             }
+            /**/
 
             if( listener != null ) {
                 listener.onMove(this);
@@ -259,14 +310,12 @@ public class GestureDetection {
         }
 
         public void end( GestureDetection detection , MotionEvent event ) {
-            if( detection.count < 1 ) {
-                return;
-            }
-            else if( detection.count == 1 ) {
+
+            if( detection.count == 1 ) {
                 if( listener != null ) {
                     listener.onEnd(this);
                 }
-                clear();
+                delta = 0.0f;
                 return;
             }
 
@@ -281,8 +330,8 @@ public class GestureDetection {
                     continue;
                 }
 
-                int idx = findIDIndex( event.getPointerId(i) );
-                if( idx > 0 ) {
+                int idx = findID(event.getPointerId(i));
+                if( idx >= 0 ) {
                     trackAngle[idx] = Helpers.clampAngle(detection.getAngle(event.getX(i), event.getY(i)) - delta);
                 }
             }
