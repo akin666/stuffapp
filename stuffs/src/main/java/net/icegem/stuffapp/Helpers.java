@@ -53,19 +53,21 @@ public class Helpers {
         );
     }
 
+    public static float clampAngle( float angle ) {
+        while( angle < 0.0f ) {
+            angle += 360.0f;
+        }
+        while( angle >= 360.0f ) {
+            angle -= 360.0f;
+        }
+
+        // now  ]0,360]
+        return angle;
+    }
+
     public static float distanceBetweenAngles( float a , float b ) {
-        while( a < 0.0f ) {
-            a += 360.0f;
-        }
-        while( b < 0.0f ) {
-            b += 360.0f;
-        }
-        while( a >= 360.0f ) {
-            a -= 360.0f;
-        }
-        while( b >= 360.0f ) {
-            b -= 360.0f;
-        }
+        a = clampAngle(a);
+        b = clampAngle(b);
 
         // now both are ]0,360]
         float big = b;
