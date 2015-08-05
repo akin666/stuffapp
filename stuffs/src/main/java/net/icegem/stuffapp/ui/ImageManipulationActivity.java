@@ -1,6 +1,7 @@
 package net.icegem.stuffapp.ui;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -10,6 +11,7 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,10 +32,18 @@ public class ImageManipulationActivity extends Activity
         GestureDetection.Pinch.Listener,
         GestureDetection.Rotate.Listener
 {
+    public static final String ACTION = "Image_Manipulation";
+
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_CROP = 2;
+    private static final int REQUEST_GALLERY = 3;
+
     private Uri uri;
     private ImageView picture = null;
     private ImageView hud = null;
+    boolean nosave = false;
 
+    private boolean noImage = false;
     private Bitmap bitmap = null;
 
     private GestureDetection gestures;
@@ -50,6 +60,8 @@ public class ImageManipulationActivity extends Activity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        nosave = false;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_manipulation);
 
@@ -58,27 +70,40 @@ public class ImageManipulationActivity extends Activity
 
         picture = (ImageView)findViewById(R.id.picture);
         hud = (ImageView)findViewById(R.id.hud);
-        /// TODO! For some reason, setImageURI scales the image, investigate why.
-        /// (something todo with screen DPI, jeez.. why at this abstraction level, stupid..)
-        /// picture.setImageURI(uri);
-
-        Bitmap bitmap = Helpers.loadBitmap( this , uri );
-        picture.setImageBitmap( bitmap );
-
-        dimensions = new Point( bitmap.getWidth() , bitmap.getHeight() );
-
-        picture.setScaleType(ImageView.ScaleType.MATRIX);
-        picture.setAdjustViewBounds(false);
 
         gestures = new GestureDetection( picture );
-
         gestures.pan().set( this );
         gestures.pinch().set( this );
         gestures.rotate().set( this );
 
-        bitmap = Helpers.emptyBitMap( dimensions.x , dimensions.y );
+        /// TODO! For some reason, setImageURI scales the image, investigate why.
+        /// (something todo with screen DPI, jeez.. why at this abstraction level, stupid..)
+        /// picture.setImageURI(uri);
 
-        hud.setImageBitmap(bitmap);
+        loadUri();
+
+        if( !noImage ) {
+            Bitmap bitmap = Helpers.emptyBitMap(dimensions.x, dimensions.y);
+            hud.setImageBitmap(bitmap);
+        }
+    }
+
+    private void loadUri() {
+        if( uri != null && !uri.equals(Uri.EMPTY) ) {
+            noImage = false;
+            Bitmap bitmap = Helpers.loadBitmap(this, uri);
+            picture.setImageBitmap(bitmap);
+
+            dimensions = new Point(bitmap.getWidth(), bitmap.getHeight());
+
+            picture.setScaleType(ImageView.ScaleType.MATRIX);
+            picture.setAdjustViewBounds(false);
+
+            calculateMatrix();
+        } else {
+            noImage = true;
+            // No image.
+        }
     }
 
     @Override
@@ -110,7 +135,30 @@ public class ImageManipulationActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void finish() {
+        if( !nosave ) {
+            save();
+        }
+        super.finish();
+    }
+
+    public void save() {
+        Intent intent = new Intent();
+
+        intent.setData(uri);
+        intent.setAction(ACTION);
+
+        // http://stackoverflow.com/questions/2497205/how-to-return-a-result-startactivityforresult-from-a-tabhost-activity
+        if (getParent() == null) {
+            setResult(Activity.RESULT_OK, intent);
+        } else {
+            getParent().setResult(Activity.RESULT_OK, intent);
+        }
+    }
+
     public void save(View view) {
+        nosave = false;
         finish();
     }
 
@@ -128,7 +176,66 @@ public class ImageManipulationActivity extends Activity
     }
 
     public void dismiss(View view) {
+        nosave = true;
         finish();
+    }
+
+    public void crop(View view) {
+    }
+
+    public void brightness(View view) {
+    }
+
+    public void gallery(View view) {
+        gallery();
+    }
+
+    public void camera(View view) {
+        camera();
+    }
+
+    private void camera() {
+        try {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+        catch (ActivityNotFoundException e) {
+            Common.toastLong(this, "This device doesn't support the camera action!: " + e.getMessage());
+        }
+    }
+
+    private void gallery() {
+        Intent intent = new Intent();
+
+        Bundle extras = getIntent().getExtras();
+
+        // call android default gallery
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+
+        // crop image
+        if(extras.containsKey("width") ){
+            intent.putExtra("outputX", extras.getInt("width"));
+        }
+        if(extras.containsKey("height") ){
+            intent.putExtra("outputY", extras.getInt("height"));
+        }
+        if(extras.containsKey("aspectX") ){
+            intent.putExtra("aspectX", extras.getFloat("aspectX"));
+        }
+        if(extras.containsKey("aspectY") ){
+            intent.putExtra("aspectY", extras.getFloat("aspectY"));
+        }
+
+        try {
+            intent.putExtra("return-data", true);
+            startActivityForResult( Intent.createChooser(intent,"Complete action using"), REQUEST_GALLERY );
+        }
+        catch (ActivityNotFoundException e) {
+            Common.toastLong(this, "This device doesn't support the camera action!: " + e.getMessage());
+        }
     }
 
     public void calculateMatrix() {
@@ -166,41 +273,6 @@ public class ImageManipulationActivity extends Activity
         return gestures.onTouchEvent(event);
     }
 
-    /*
-    @Override
-    public void beginGesture(GestureDetection detection) {
-    }
-
-    @Override
-    public void beginMove(GestureDetection detection) {
-    }
-
-    @Override
-    public void onGesture(GestureDetection detection) {
-        PointF delta = detection.getMoveDelta();
-        calculateMatrix(detection.getAngle(), detection.getScale() , delta.x , delta.y );
-    }
-
-    @Override
-    public void endGesture(GestureDetection detection) {
-        rotation += detection.getAngle();
-        scale *= detection.getScale();
-
-        if( scale < (-Float.MAX_VALUE) ) {
-            scale = -Float.MAX_VALUE;
-        }
-        calculateMatrix(0.0f, 1.0f, 0.0f , 0.0f);
-    }
-
-    @Override
-    public void endMove(GestureDetection detection) {
-        PointF delta = detection.getMoveDelta();
-        offset.x += delta.x;
-        offset.y += delta.y;
-        calculateMatrix(0.0f, 1.0f, 0.0f , 0.0f);
-    }
-    */
-
     @Override
     public void onCancel(GestureDetection.Pan pan) {
         offsetDelta.set(0,0);
@@ -210,7 +282,7 @@ public class ImageManipulationActivity extends Activity
 
     @Override
     public void onBegin(GestureDetection.Pan pan) {
-        offsetDelta.set(0,0);
+        offsetDelta.set(0, 0);
     }
 
     @Override
@@ -285,5 +357,34 @@ public class ImageManipulationActivity extends Activity
         rotationDelta = 0.0f;
 
         calculateMatrix();
+    }
+
+    public void setUri( Uri newUri ) {
+        uri = newUri;
+        Intent intent = getIntent();
+        intent.setData(uri);
+
+        loadUri();
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if( intent == null ) {
+            return;
+        }
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            setUri(intent.getData());
+
+            return;
+        }
+
+        if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
+            // Gallery app (samsung S4)
+            // Photos app (samsung S4)
+            // Dropbox app (samsung S4)
+            setUri(intent.getData());
+
+            return;
+        }
     }
 }

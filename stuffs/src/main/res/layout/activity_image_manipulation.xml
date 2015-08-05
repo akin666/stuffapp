@@ -17,38 +17,83 @@
         android:layout_height="fill_parent"
         android:scaleType="matrix" />
 
-    <LinearLayout
-        android:layout_marginBottom="10dp"
-        android:padding="5dp"
-        android:layout_gravity="center|bottom"
-        android:layout_width="match_parent"
+    <HorizontalScrollView
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#80FFFFFF">
+        android:layout_marginBottom="10dp"
+        android:animateLayoutChanges="true"
+        android:scrollbars="horizontal"
+        android:layout_gravity="center|bottom">
 
-        <Button
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/id_save"
-            android:text="@string/save"
-            android:onClick="save"
-            style="@style/Base.Widget.AppCompat.Button.Small"/>
-
-        <Button
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/id_button"
-            android:text="@string/reset"
-            android:onClick="reset"
-            style="@style/Base.Widget.AppCompat.Button.Small"/>
+            android:orientation="horizontal"
+            android:background="#80FFFFFF">
 
-        <Button
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/id_cancel"
-            android:text="@string/cancel"
-            android:onClick="dismiss"
-            style="@style/Base.Widget.AppCompat.Button.Small"/>
-    </LinearLayout>
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="@string/crop"
+                android:onClick="crop"
+                style="@style/Base.Widget.AppCompat.Button.Small"/>
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/brightness"
+                android:onClick="brightness"
+                style="@style/Base.Widget.AppCompat.Button.Small"/>
+
+            <Space
+                android:layout_width="15dp"
+                android:layout_height="match_parent" />
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/id_button"
+                android:text="@string/reset"
+                android:onClick="reset"
+                style="@style/Base.Widget.AppCompat.Button.Small"/>
+
+            <Space
+                android:layout_width="15dp"
+                android:layout_height="match_parent" />
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/id_save"
+                android:text="@string/save"
+                android:onClick="save"
+                style="@style/Base.Widget.AppCompat.Button.Small"/>
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel"
+                android:onClick="dismiss"
+                style="@style/Base.Widget.AppCompat.Button.Small"/>
+
+            <Space
+                android:layout_width="15dp"
+                android:layout_height="match_parent" />
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="@string/camera"
+                android:onClick="camera"
+                style="@style/Base.Widget.AppCompat.Button.Small"/>
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="@string/gallery"
+                android:onClick="gallery"
+                style="@style/Base.Widget.AppCompat.Button.Small"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
 </FrameLayout>

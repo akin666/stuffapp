@@ -23,6 +23,7 @@ import net.icegem.stuffapp.database.DBText;
 
 public class CollectionEditActivity extends AppCompatActivity {
 
+    private static final int REQUEST_IMAGE_EDIT = 7;
     private Collection collection = null;
 
     private EditText name;
@@ -151,14 +152,14 @@ public class CollectionEditActivity extends AppCompatActivity {
     }
 
     public void editPicture(View view ){
-        Intent intent = new Intent(this, ImageActivity.class);
+        Intent intent = new Intent(this, ImageManipulationActivity.class);
         intent.putExtra("width" , 1080 );
 
         Uri uri = collection.getPictureUri();
         if( uri != null ) {
             intent.setData(uri);
         }
-        startActivityForResult(intent, 0);
+        startActivityForResult(intent, REQUEST_IMAGE_EDIT);
         saveState();
     }
 
@@ -212,7 +213,7 @@ public class CollectionEditActivity extends AppCompatActivity {
         }
 
         // Image action.
-        if(action.equals(ImageActivity.ACTION)) {
+        if(requestCode == REQUEST_IMAGE_EDIT) {
             if (resultCode == RESULT_OK) {
                 Uri nUri = intent.getData();
                 if( nUri != null ) {
