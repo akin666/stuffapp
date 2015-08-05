@@ -39,12 +39,21 @@ public class ImageManipulationActivity extends Activity
     private static final int REQUEST_CROP = 2;
     private static final int REQUEST_GALLERY = 3;
 
+    public static enum State {
+        MAIN,
+        CROP,
+        SCALE
+    }
+
+    private State state = State.MAIN;
+
     private Uri uri;
     private ImageView picture = null;
     private ImageView hud = null;
     boolean nosave = false;
 
-    private View menuView = null;
+    private View menu = null;
+    private View requestMenu = null;
 
     TextView bgText = null;
     private boolean noImage = false;
@@ -75,7 +84,8 @@ public class ImageManipulationActivity extends Activity
         picture = (ImageView)findViewById(R.id.picture);
         hud = (ImageView)findViewById(R.id.hud);
         bgText = (TextView)findViewById(R.id.bgtext);
-        menuView = (View)findViewById(R.id.menu);
+        menu = (View)findViewById(R.id.menu);
+        requestMenu = (View)findViewById(R.id.requestMenu);
 
         gestures = new GestureDetection( picture );
         gestures.pan().set( this );
@@ -86,6 +96,8 @@ public class ImageManipulationActivity extends Activity
         /// (something todo with screen DPI, jeez.. why at this abstraction level, stupid..)
         /// picture.setImageURI(uri);
 
+        state = State.MAIN;
+
         loadUri();
 
         if( !noImage ) {
@@ -94,14 +106,24 @@ public class ImageManipulationActivity extends Activity
         }
 
         hideMenu(false);
+        hideRequestMenu(true);
     }
 
     private void hideMenu( boolean hidden ) {
         if( hidden ) {
-            menuView.setVisibility(View.INVISIBLE);
+            menu.setVisibility(View.INVISIBLE);
         }
         else {
-            menuView.setVisibility(View.VISIBLE);
+            menu.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideRequestMenu( boolean hidden ) {
+        if( hidden ) {
+            requestMenu.setVisibility(View.INVISIBLE);
+        }
+        else {
+            requestMenu.setVisibility(View.VISIBLE);
         }
     }
 
@@ -194,18 +216,44 @@ public class ImageManipulationActivity extends Activity
         calculateMatrix();
     }
 
+    public void requestOk(View view) {
+        switch( state ) {
+            case CROP : {
+            }
+            default:
+                break;
+        }
+        state = State.MAIN;
+
+        hideMenu(false);
+        hideRequestMenu(true);
+    }
+
+    public void requestCancel(View view) {
+        state = State.MAIN;
+
+        hideMenu(false);
+        hideRequestMenu(true);
+    }
+
     public void dismiss(View view) {
         nosave = true;
         finish();
     }
 
     public void crop(View view) {
+        hideMenu(true);
+        hideRequestMenu(false);
     }
 
     public void brightness(View view) {
+        hideMenu(true);
+        hideRequestMenu(false);
     }
 
     public void resize(View view) {
+        hideMenu(true);
+        hideRequestMenu(false);
     }
 
     public void gallery(View view) {
