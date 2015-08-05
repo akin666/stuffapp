@@ -17,6 +17,31 @@
         android:layout_height="fill_parent"
         android:scaleType="matrix" />
 
+    <LinearLayout
+        android:id="@+id/requestMenu"
+        android:visibility="invisible"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal"
+        android:layout_gravity="center|bottom"
+        android:background="#80FFFFFF">
+
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/ok"
+            android:onClick="requestOk"
+            style="@style/Base.Widget.AppCompat.Button.Small"/>
+
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:onClick="requestCancel"
+            style="@style/Base.Widget.AppCompat.Button.Small"/>
+    </LinearLayout>
+
     <HorizontalScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
