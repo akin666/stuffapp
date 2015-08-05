@@ -98,10 +98,10 @@ public class ImageManipulationActivity extends Activity
 
     private void hideMenu( boolean hidden ) {
         if( hidden ) {
-            menuView.setVisibility(View.VISIBLE);
+            menuView.setVisibility(View.INVISIBLE);
         }
         else {
-            menuView.setVisibility(View.INVISIBLE);
+            menuView.setVisibility(View.VISIBLE);
         }
     }
 
