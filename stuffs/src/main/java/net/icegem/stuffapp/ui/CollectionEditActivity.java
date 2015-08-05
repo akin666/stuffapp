@@ -222,6 +222,7 @@ public class CollectionEditActivity extends AppCompatActivity {
                     saveState();
                 }
             }
+            return;
         }
     }
 }

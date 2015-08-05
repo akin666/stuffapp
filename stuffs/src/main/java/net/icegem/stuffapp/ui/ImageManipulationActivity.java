@@ -44,6 +44,8 @@ public class ImageManipulationActivity extends Activity
     private ImageView hud = null;
     boolean nosave = false;
 
+    private View menuView = null;
+
     TextView bgText = null;
     private boolean noImage = false;
     private Bitmap bitmap = null;
@@ -73,6 +75,7 @@ public class ImageManipulationActivity extends Activity
         picture = (ImageView)findViewById(R.id.picture);
         hud = (ImageView)findViewById(R.id.hud);
         bgText = (TextView)findViewById(R.id.bgtext);
+        menuView = (View)findViewById(R.id.menu);
 
         gestures = new GestureDetection( picture );
         gestures.pan().set( this );
@@ -88,6 +91,17 @@ public class ImageManipulationActivity extends Activity
         if( !noImage ) {
             Bitmap bitmap = Helpers.emptyBitMap(dimensions.x, dimensions.y);
             hud.setImageBitmap(bitmap);
+        }
+
+        hideMenu(false);
+    }
+
+    private void hideMenu( boolean hidden ) {
+        if( hidden ) {
+            menuView.setVisibility(View.VISIBLE);
+        }
+        else {
+            menuView.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -189,6 +203,9 @@ public class ImageManipulationActivity extends Activity
     }
 
     public void brightness(View view) {
+    }
+
+    public void resize(View view) {
     }
 
     public void gallery(View view) {

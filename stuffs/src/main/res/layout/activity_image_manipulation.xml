@@ -20,6 +20,7 @@
     <HorizontalScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/menu"
         android:layout_marginBottom="10dp"
         android:animateLayoutChanges="true"
         android:scrollbars="horizontal"
@@ -43,6 +44,13 @@
                 android:layout_height="wrap_content"
                 android:text="@string/brightness"
                 android:onClick="brightness"
+                style="@style/Base.Widget.AppCompat.Button.Small"/>
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="@string/resize"
+                android:onClick="resize"
                 style="@style/Base.Widget.AppCompat.Button.Small"/>
 
             <Space
