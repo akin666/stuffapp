@@ -42,7 +42,8 @@ public class ImageManipulationActivity extends Activity
     public static enum State {
         MAIN,
         CROP,
-        SCALE
+        SCALE,
+        BRIGHTNESS,
     }
 
     private State state = State.MAIN;
@@ -107,6 +108,9 @@ public class ImageManipulationActivity extends Activity
 
         hideMenu(false);
         hideRequestMenu(true);
+    }
+
+    private void setupHud() {
     }
 
     private void hideMenu( boolean hidden ) {
@@ -210,8 +214,8 @@ public class ImageManipulationActivity extends Activity
         rotation = 0.0f;
         rotationDelta = 0.0f;
 
-        offset.set(0,0);
-        offsetDelta.set(0,0);
+        offset.set(0, 0);
+        offsetDelta.set(0, 0);
 
         calculateMatrix();
     }
