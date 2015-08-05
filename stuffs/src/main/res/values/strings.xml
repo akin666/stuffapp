@@ -76,4 +76,5 @@
     <color name="grey">#444444</color>
     <string name="title_activity_image_manipulation">ImageManipulationActivity</string>
     <string name="brightness">brightness</string>
+    <string name="resize">Resize</string>
 </resources>

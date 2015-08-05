@@ -25,6 +25,7 @@ import net.icegem.stuffapp.database.DBType;
 import java.util.List;
 
 public class ItemEditActivity extends Activity {
+    private static final int REQUEST_IMAGE_EDIT = 7;
 
     private DBConnection connection;
     private Item item = null;
@@ -38,8 +39,6 @@ public class ItemEditActivity extends Activity {
     TextView link = null;
     //ImageView picture = null;
     TextView location = null;
-
-    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,14 +197,15 @@ public class ItemEditActivity extends Activity {
     }
 
     public void editPicture(View view) {
-        Intent intent = new Intent(this, ImageActivity.class);
+        Intent intent = new Intent(this, ImageManipulationActivity.class);
         intent.putExtra("width" , 1080 );
+
         Uri uri = item.getPictureUri();
         if( uri != null ) {
             intent.setData(uri);
         }
-        startActivityForResult(intent, 0);
-        saveState();;
+        startActivityForResult(intent, REQUEST_IMAGE_EDIT);
+        saveState();
     }
 
     public void save()
@@ -285,7 +285,7 @@ public class ItemEditActivity extends Activity {
         }
 
         // Image action.
-        if(action.equals(ImageActivity.ACTION)) {
+        if(requestCode == REQUEST_IMAGE_EDIT) {
             if (resultCode == RESULT_OK) {
                 Uri nUri = intent.getData();
                 if( nUri != null ) {
@@ -294,6 +294,7 @@ public class ItemEditActivity extends Activity {
                     saveState();
                 }
             }
+            return;
         }
     }
 
