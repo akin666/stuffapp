@@ -10,12 +10,13 @@
         android:layout_height="fill_parent"
         android:scaleType="matrix" />
 
-    <ImageView
+    <LinearLayout
         android:layout_gravity="center_vertical|center_horizontal"
         android:id="@+id/hud"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:scaleType="matrix" />
+        android:orientation="vertical"
+        />
 
     <LinearLayout
         android:id="@+id/requestMenu"
