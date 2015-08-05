@@ -77,12 +77,6 @@
             android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity
-            android:name=".ui.ImageActivity"
-            android:excludeFromRecents="true"
-            android:label="@string/title_activity_image"
-            android:theme="@android:style/Theme.Dialog" >
-        </activity>
-        <activity
             android:name=".ui.ImageManipulationActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_image_manipulation" >
