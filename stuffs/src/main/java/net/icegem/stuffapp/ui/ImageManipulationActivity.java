@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import net.icegem.stuffapp.Constants;
 import net.icegem.stuffapp.GestureDetection;
@@ -43,6 +44,7 @@ public class ImageManipulationActivity extends Activity
     private ImageView hud = null;
     boolean nosave = false;
 
+    TextView bgText = null;
     private boolean noImage = false;
     private Bitmap bitmap = null;
 
@@ -70,6 +72,7 @@ public class ImageManipulationActivity extends Activity
 
         picture = (ImageView)findViewById(R.id.picture);
         hud = (ImageView)findViewById(R.id.hud);
+        bgText = (TextView)findViewById(R.id.bgtext);
 
         gestures = new GestureDetection( picture );
         gestures.pan().set( this );
@@ -90,6 +93,8 @@ public class ImageManipulationActivity extends Activity
 
     private void loadUri() {
         if( uri != null && !uri.equals(Uri.EMPTY) ) {
+            bgText.setVisibility(View.INVISIBLE);
+
             noImage = false;
             Bitmap bitmap = Helpers.loadBitmap(this, uri);
             picture.setImageBitmap(bitmap);
@@ -101,8 +106,8 @@ public class ImageManipulationActivity extends Activity
 
             calculateMatrix();
         } else {
+            bgText.setVisibility(View.VISIBLE);
             noImage = true;
-            // No image.
         }
     }
 
