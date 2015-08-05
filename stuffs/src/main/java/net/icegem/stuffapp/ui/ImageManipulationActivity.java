@@ -2,9 +2,11 @@ package net.icegem.stuffapp.ui;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -19,7 +21,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.icegem.stuffapp.Constants;
@@ -50,7 +55,7 @@ public class ImageManipulationActivity extends Activity
 
     private Uri uri;
     private ImageView picture = null;
-    private ImageView hud = null;
+    private HudView hud = null;
     boolean nosave = false;
 
     private View menu = null;
@@ -72,6 +77,32 @@ public class ImageManipulationActivity extends Activity
     private PointF offset = new PointF(0,0);
     private PointF offsetDelta = new PointF(0,0);
 
+    private class HudView extends View {
+        private Matrix matrix = null;
+
+        public HudView(Context context) {
+            super(context);
+        }
+
+        public void setMatrix(Matrix matrix ) {
+            this.matrix = matrix;
+        }
+
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+
+            if( matrix != null ) {
+                canvas.setMatrix(matrix);
+            }
+
+            Paint paint = new Paint();
+            paint.setColor(Color.BLACK);
+            // draw a circle
+
+            canvas.drawCircle( canvas.getWidth() / 2 , canvas.getHeight() / 2 , 50 , paint );
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         nosave = false;
@@ -83,7 +114,6 @@ public class ImageManipulationActivity extends Activity
         uri = intent.getData();
 
         picture = (ImageView)findViewById(R.id.picture);
-        hud = (ImageView)findViewById(R.id.hud);
         bgText = (TextView)findViewById(R.id.bgtext);
         menu = (View)findViewById(R.id.menu);
         requestMenu = (View)findViewById(R.id.requestMenu);
@@ -101,16 +131,18 @@ public class ImageManipulationActivity extends Activity
 
         loadUri();
 
-        if( !noImage ) {
-            Bitmap bitmap = Helpers.emptyBitMap(dimensions.x, dimensions.y);
-            hud.setImageBitmap(bitmap);
-        }
+        setupHud();
 
         hideMenu(false);
         hideRequestMenu(true);
     }
 
     private void setupHud() {
+        LinearLayout layout = (LinearLayout)findViewById(R.id.hud);
+
+        hud = new HudView(this);
+
+        layout.addView(hud);
     }
 
     private void hideMenu( boolean hidden ) {
@@ -328,6 +360,10 @@ public class ImageManipulationActivity extends Activity
         matrix.postTranslate(offset.x + offsetDelta.x, offset.y + offsetDelta.y);
 
         picture.setImageMatrix(matrix);
+        hud.setMatrix(matrix);
+
+        hud.invalidate();
+
 
         //hud.setImageBitmap(bitmap);
 /*
