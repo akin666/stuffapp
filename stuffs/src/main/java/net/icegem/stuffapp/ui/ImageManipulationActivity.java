@@ -11,6 +11,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -79,6 +80,7 @@ public class ImageManipulationActivity extends Activity
 
     private class HudView extends View {
         private Matrix matrix = null;
+        public RectF crop = new RectF(0,0,0,0);
 
         public HudView(Context context) {
             super(context);
@@ -95,11 +97,33 @@ public class ImageManipulationActivity extends Activity
                 canvas.setMatrix(matrix);
             }
 
-            Paint paint = new Paint();
-            paint.setColor(Color.BLACK);
+            Paint black = new Paint();
+            black.setColor(Color.BLACK);
+            black.setStrokeWidth(1.5f);
+            black.setAntiAlias(true);
+
+            Paint blue = new Paint();
+            blue.setColor(Color.BLUE);
+            blue.setStrokeWidth(1.5f);
+            blue.setAntiAlias(true);
+
+            Paint green = new Paint();
+            green.setColor(Color.GREEN);
+            green.setStrokeWidth(1.5f);
+            green.setAntiAlias(true);
+
+            Paint red = new Paint();
+            red.setColor(Color.RED);
+            red.setStrokeWidth(1.5f);
+            red.setAntiAlias( true );
             // draw a circle
 
-            canvas.drawCircle( canvas.getWidth() / 2 , canvas.getHeight() / 2 , 50 , paint );
+            canvas.drawLine( 0 , 0 , crop.right , crop.bottom , red );
+
+            canvas.drawCircle( 0 , 0 , 5.0f , blue );
+            canvas.drawCircle( crop.right , crop.bottom , 5.0f , green );
+
+            canvas.drawRect(crop, black);
         }
     }
 
@@ -141,8 +165,14 @@ public class ImageManipulationActivity extends Activity
         LinearLayout layout = (LinearLayout)findViewById(R.id.hud);
 
         hud = new HudView(this);
-
         layout.addView(hud);
+
+        if( noImage ) {
+            return;
+        }
+
+        // L,T,R,B
+        hud.crop.set( 0 , 0 , dimensions.x , dimensions.y );
     }
 
     private void hideMenu( boolean hidden ) {
