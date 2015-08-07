@@ -55,7 +55,6 @@ public class ImageManipulationActivity extends Activity
     private State state = State.MAIN;
 
     private Uri uri;
-    private ImageView picture = null;
     private HudView hud = null;
     boolean nosave = false;
 
@@ -63,9 +62,6 @@ public class ImageManipulationActivity extends Activity
     private View requestMenu = null;
 
     TextView bgText = null;
-    private boolean noImage = false;
-    private Bitmap bitmap = null;
-
     private GestureDetection gestures;
 
     private float scale = 1.0f;
@@ -74,13 +70,15 @@ public class ImageManipulationActivity extends Activity
     private float rotation = 0.0f;
     private float rotationDelta = 0.0f;
 
-    private Point dimensions = new Point(0,0);
     private PointF offset = new PointF(0,0);
     private PointF offsetDelta = new PointF(0,0);
 
     private class HudView extends View {
         private Matrix matrix = null;
+        private Uri uri = null;
+        private Bitmap bitmap = null;
         public RectF crop = new RectF(0,0,0,0);
+        public RectF dimensions = new RectF(0,0,0,0);
 
         public HudView(Context context) {
             super(context);
@@ -90,8 +88,33 @@ public class ImageManipulationActivity extends Activity
             this.matrix = matrix;
         }
 
+        public boolean hasImage() {
+            return uri != null && !uri.equals(Uri.EMPTY);
+        }
+
+        public void setImage( Uri uri ) {
+            this.uri = uri;
+
+            if( uri != null && !uri.equals(Uri.EMPTY) ) {
+                bitmap = Helpers.loadBitmap(getContext(), uri);
+
+                crop.set( 0 , 0 ,bitmap.getWidth() , bitmap.getHeight() );
+                dimensions.set( 0 , 0 ,bitmap.getWidth() , bitmap.getHeight() );
+
+                Log.w(Constants.AppName,"W: " + crop.right + " H: " + crop.bottom );
+            } else {
+                bitmap = null;
+                crop.set( 0 , 0 , 0 , 0 );
+                dimensions.set( 0 , 0 , 0 , 0 );
+            }
+        }
+
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
+
+            if( !hasImage() ) {
+                return;
+            }
 
             if( matrix != null ) {
                 canvas.setMatrix(matrix);
@@ -115,15 +138,31 @@ public class ImageManipulationActivity extends Activity
             Paint red = new Paint();
             red.setColor(Color.RED);
             red.setStrokeWidth(1.5f);
-            red.setAntiAlias( true );
+            red.setAntiAlias(true);
+
+            Paint yellow = new Paint();
+            yellow.setColor(Color.YELLOW);
+            yellow.setStrokeWidth(1.5f);
+            yellow.setAntiAlias(true);
             // draw a circle
 
-            canvas.drawLine( 0 , 0 , crop.right , crop.bottom , red );
+            if( bitmap != null ) {
+                canvas.drawBitmap(bitmap, new Matrix(), black);
+            }
 
-            canvas.drawCircle( 0 , 0 , 5.0f , blue );
-            canvas.drawCircle( crop.right , crop.bottom , 5.0f , green );
+            //canvas.drawRect(crop, black);
 
-            canvas.drawRect(crop, black);
+            canvas.drawLine(
+                    0, 0,
+                    crop.right, crop.bottom,
+                    red);
+            canvas.drawLine(
+                    crop.right , 0 ,
+                    0 , crop.bottom ,
+                    yellow );
+
+            canvas.drawCircle(0, 0, 10.0f, blue);
+            canvas.drawCircle(crop.right, crop.bottom, 5.0f, green);
         }
     }
 
@@ -137,12 +176,15 @@ public class ImageManipulationActivity extends Activity
         Intent intent = getIntent();
         uri = intent.getData();
 
-        picture = (ImageView)findViewById(R.id.picture);
+        ViewGroup layout = (ViewGroup)findViewById(R.id.hud);
+        hud = new HudView(this);
+        layout.addView(hud);
+
         bgText = (TextView)findViewById(R.id.bgtext);
         menu = (View)findViewById(R.id.menu);
         requestMenu = (View)findViewById(R.id.requestMenu);
 
-        gestures = new GestureDetection( picture );
+        gestures = new GestureDetection( hud );
         gestures.pan().set( this );
         gestures.pinch().set( this );
         gestures.rotate().set( this );
@@ -155,24 +197,8 @@ public class ImageManipulationActivity extends Activity
 
         loadUri();
 
-        setupHud();
-
         hideMenu(false);
         hideRequestMenu(true);
-    }
-
-    private void setupHud() {
-        LinearLayout layout = (LinearLayout)findViewById(R.id.hud);
-
-        hud = new HudView(this);
-        layout.addView(hud);
-
-        if( noImage ) {
-            return;
-        }
-
-        // L,T,R,B
-        hud.crop.set( 0 , 0 , dimensions.x , dimensions.y );
     }
 
     private void hideMenu( boolean hidden ) {
@@ -194,22 +220,13 @@ public class ImageManipulationActivity extends Activity
     }
 
     private void loadUri() {
-        if( uri != null && !uri.equals(Uri.EMPTY) ) {
+        hud.setImage( uri );
+
+        if( hud.hasImage() ) {
             bgText.setVisibility(View.INVISIBLE);
-
-            noImage = false;
-            Bitmap bitmap = Helpers.loadBitmap(this, uri);
-            picture.setImageBitmap(bitmap);
-
-            dimensions = new Point(bitmap.getWidth(), bitmap.getHeight());
-
-            picture.setScaleType(ImageView.ScaleType.MATRIX);
-            picture.setAdjustViewBounds(false);
-
             calculateMatrix();
         } else {
             bgText.setVisibility(View.VISIBLE);
-            noImage = true;
         }
     }
 
@@ -376,35 +393,22 @@ public class ImageManipulationActivity extends Activity
 
     public void calculateMatrix() {
 
-        int w = picture.getWidth();
-        int h = picture.getHeight();
+        float w = hud.getWidth();
+        float h = hud.getHeight();
 
         Matrix matrix = new Matrix();
 
         float tscale = scaleDelta * scale;
-        matrix.postTranslate(-dimensions.x / 2.0f, -dimensions.y / 2.0f);
+        matrix.postTranslate(-hud.dimensions.right / 2.0f, -hud.dimensions.bottom / 2.0f);
         matrix.postRotate(rotationDelta + rotation);
         matrix.postScale(tscale, tscale);
 
         matrix.postTranslate(w / 2.0f, h / 2.0f);
         matrix.postTranslate(offset.x + offsetDelta.x, offset.y + offsetDelta.y);
 
-        picture.setImageMatrix(matrix);
         hud.setMatrix(matrix);
 
         hud.invalidate();
-
-
-        //hud.setImageBitmap(bitmap);
-/*
-        Canvas canvas = new Canvas(bitmap);
-
-        Paint p = new Paint();
-        p.setARGB(0x77 , 0x77 ,0x77 ,0x77);
-
-        canvas.drawCircle(offset.x + ax, offset.y + ay, 10, p);
-        canvas.save();
-        */
     }
 
     @Override
