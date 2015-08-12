@@ -27,6 +27,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import net.icegem.stuffapp.Constants;
 import net.icegem.stuffapp.GestureDetection;
@@ -34,10 +35,6 @@ import net.icegem.stuffapp.Helpers;
 import net.icegem.stuffapp.R;
 
 public class ImageManipulationActivity extends Activity
-        implements
-        GestureDetection.Pan.Listener,
-        GestureDetection.Pinch.Listener,
-        GestureDetection.Rotate.Listener
 {
     public static final String ACTION = "Image_Manipulation";
 
@@ -45,47 +42,47 @@ public class ImageManipulationActivity extends Activity
     private static final int REQUEST_CROP = 2;
     private static final int REQUEST_GALLERY = 3;
 
-    public static enum State {
-        MAIN,
-        CROP,
-        SCALE,
-        BRIGHTNESS,
-    }
-
-    private State state = State.MAIN;
-
     private Uri uri;
     private HudView hud = null;
     boolean nosave = false;
 
     private View menu = null;
     private View requestMenu = null;
+    private ToggleButton toggle = null;
+    private TextView bgText = null;
 
-    TextView bgText = null;
     private GestureDetection gestures;
 
-    private float scale = 1.0f;
-    private float scaleDelta = 1.0f;
+    private class HudView extends View
+            implements
+            GestureDetection.Pan.Listener,
+            GestureDetection.Pinch.Listener,
+            GestureDetection.Rotate.Listener {
 
-    private float rotation = 0.0f;
-    private float rotationDelta = 0.0f;
+        private boolean frameLockedState = true;
 
-    private PointF offset = new PointF(0,0);
-    private PointF offsetDelta = new PointF(0,0);
-
-    private class HudView extends View {
-        private Matrix matrix = null;
         private Uri uri = null;
         private Bitmap bitmap = null;
+
         public RectF crop = new RectF(0,0,0,0);
         public RectF dimensions = new RectF(0,0,0,0);
+
+        private float zoom = 1.0f;
+        private float scale = 1.0f;
+        private float pinchDelta = 1.0f;
+
+        private float rotation = 0.0f;
+        private float rotationDelta = 0.0f;
+
+        private PointF offset = new PointF(0,0);
+        private PointF offsetDelta = new PointF(0,0);
 
         public HudView(Context context) {
             super(context);
         }
 
-        public void setMatrix(Matrix matrix ) {
-            this.matrix = matrix;
+        public void frameLock( boolean state ) {
+            frameLockedState = state;
         }
 
         public boolean hasImage() {
@@ -116,7 +113,25 @@ public class ImageManipulationActivity extends Activity
                 return;
             }
 
-            if( matrix != null ) {
+
+            float w = getWidth();
+            float h = getHeight();
+
+            {
+                Matrix matrix = new Matrix();
+
+                float tzoom = zoom;
+                if( !frameLockedState ) {
+                    tzoom *= pinchDelta;
+                }
+
+                matrix.postTranslate(-hud.dimensions.right / 2.0f, -hud.dimensions.bottom / 2.0f);
+                matrix.postRotate(rotationDelta + rotation);
+                matrix.postScale(tzoom, tzoom);
+
+                matrix.postTranslate(w / 2.0f, h / 2.0f);
+                matrix.postTranslate(offset.x + offsetDelta.x, offset.y + offsetDelta.y);
+
                 canvas.setMatrix(matrix);
             }
 
@@ -124,6 +139,7 @@ public class ImageManipulationActivity extends Activity
             black.setColor(Color.BLACK);
             black.setStrokeWidth(1.5f);
             black.setAntiAlias(true);
+            black.setAlpha(128);
 
             Paint blue = new Paint();
             blue.setColor(Color.BLUE);
@@ -147,22 +163,141 @@ public class ImageManipulationActivity extends Activity
             // draw a circle
 
             if( bitmap != null ) {
-                canvas.drawBitmap(bitmap, new Matrix(), black);
+                Matrix matrix = new Matrix();
+
+                float tscale = scale;
+                if( !frameLockedState ) {
+                    tscale *= pinchDelta;
+                }
+                matrix.postScale(tscale, tscale);
+
+                Paint imagePaint = new Paint();
+                imagePaint.setColor(Color.BLACK);
+                imagePaint.setAntiAlias(true);
+
+                canvas.drawBitmap(bitmap, matrix, imagePaint);
             }
 
-            //canvas.drawRect(crop, black);
+            canvas.drawRect(crop, black);
 
             canvas.drawLine(
                     0, 0,
                     crop.right, crop.bottom,
                     red);
             canvas.drawLine(
-                    crop.right , 0 ,
-                    0 , crop.bottom ,
-                    yellow );
+                    crop.right, 0,
+                    0, crop.bottom,
+                    yellow);
 
             canvas.drawCircle(0, 0, 10.0f, blue);
             canvas.drawCircle(crop.right, crop.bottom, 5.0f, green);
+        }
+
+
+        @Override
+        public void onCancel(GestureDetection.Pan pan) {
+            offsetDelta.set(0,0);
+
+            hud.invalidate();
+        }
+
+        @Override
+        public void onBegin(GestureDetection.Pan pan) {
+            offsetDelta.set(0, 0);
+        }
+
+        @Override
+        public void onMove(GestureDetection.Pan pan) {
+            PointF delta = pan.getDelta();
+            offsetDelta.x = delta.x;
+            offsetDelta.y = delta.y;
+
+            hud.invalidate();
+        }
+
+        @Override
+        public void onEnd(GestureDetection.Pan pan) {
+            PointF delta = pan.getDelta();
+            offset.x += delta.x;
+            offset.y += delta.y;
+
+            offsetDelta.set(0,0);
+
+            hud.invalidate();
+        }
+
+        @Override
+        public void onCancel(GestureDetection.Pinch pinch) {
+            pinchDelta = 1.0f;
+
+            hud.invalidate();
+        }
+
+        @Override
+        public void onBegin(GestureDetection.Pinch pinch) {
+            pinchDelta = 1.0f;
+        }
+
+        @Override
+        public void onMove(GestureDetection.Pinch pinch) {
+            pinchDelta = pinch.getDelta();
+
+            hud.invalidate();
+        }
+
+        @Override
+        public void onEnd(GestureDetection.Pinch pinch) {
+            if( frameLockedState ) {
+                scale *= pinch.getDelta();
+            }
+            else {
+                zoom *= pinch.getDelta();
+            }
+
+            pinchDelta = 1.0f;
+
+            hud.invalidate();
+        }
+
+        @Override
+        public void onCancel(GestureDetection.Rotate rotate) {
+            rotationDelta = 0.0f;
+
+            hud.invalidate();
+        }
+
+        @Override
+        public void onBegin(GestureDetection.Rotate rotate) {
+            rotationDelta = 0.0f;
+        }
+
+        @Override
+        public void onMove(GestureDetection.Rotate rotate) {
+            rotationDelta = rotate.getDelta();
+
+            hud.invalidate();
+        }
+
+        @Override
+        public void onEnd(GestureDetection.Rotate rotate) {
+            rotation += rotate.getDelta();
+            rotationDelta = 0.0f;
+
+            hud.invalidate();
+        }
+
+        public void reset() {
+            scale = 1.0f;
+            zoom = 1.0f;
+            pinchDelta = 1.0f;
+
+            rotation = 0.0f;
+            rotationDelta = 0.0f;
+
+            offset.set(0, 0);
+            offsetDelta.set(0, 0);
+
+            hud.invalidate();
         }
     }
 
@@ -183,17 +318,16 @@ public class ImageManipulationActivity extends Activity
         bgText = (TextView)findViewById(R.id.bgtext);
         menu = (View)findViewById(R.id.menu);
         requestMenu = (View)findViewById(R.id.requestMenu);
+        toggle = (ToggleButton)findViewById(R.id.framelock);
 
         gestures = new GestureDetection( hud );
-        gestures.pan().set( this );
-        gestures.pinch().set( this );
-        gestures.rotate().set( this );
+        gestures.pan().set( hud );
+        gestures.pinch().set( hud );
+        gestures.rotate().set( hud );
 
         /// TODO! For some reason, setImageURI scales the image, investigate why.
         /// (something todo with screen DPI, jeez.. why at this abstraction level, stupid..)
         /// picture.setImageURI(uri);
-
-        state = State.MAIN;
 
         loadUri();
 
@@ -224,7 +358,7 @@ public class ImageManipulationActivity extends Activity
 
         if( hud.hasImage() ) {
             bgText.setVisibility(View.INVISIBLE);
-            calculateMatrix();
+            hud.invalidate();
         } else {
             bgText.setVisibility(View.VISIBLE);
         }
@@ -240,7 +374,7 @@ public class ImageManipulationActivity extends Activity
         super.onWindowFocusChanged(hasFocus);
 
         if( hasFocus ) {
-            calculateMatrix();
+            hud.invalidate();
         }
     }
 
@@ -248,13 +382,7 @@ public class ImageManipulationActivity extends Activity
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        // as you specify a parent activity
 
         return super.onOptionsItemSelected(item);
     }
@@ -287,34 +415,15 @@ public class ImageManipulationActivity extends Activity
     }
 
     public void reset(View view) {
-        scale = 1.0f;
-        scaleDelta = 1.0f;
-
-        rotation = 0.0f;
-        rotationDelta = 0.0f;
-
-        offset.set(0, 0);
-        offsetDelta.set(0, 0);
-
-        calculateMatrix();
+        hud.reset();
     }
 
     public void requestOk(View view) {
-        switch( state ) {
-            case CROP : {
-            }
-            default:
-                break;
-        }
-        state = State.MAIN;
-
         hideMenu(false);
         hideRequestMenu(true);
     }
 
     public void requestCancel(View view) {
-        state = State.MAIN;
-
         hideMenu(false);
         hideRequestMenu(true);
     }
@@ -327,6 +436,12 @@ public class ImageManipulationActivity extends Activity
     public void crop(View view) {
         hideMenu(true);
         hideRequestMenu(false);
+    }
+
+    public void frameLock(View view) {
+        if( hud != null && toggle != null ) {
+            hud.frameLock(toggle.isChecked());
+        }
     }
 
     public void brightness(View view) {
@@ -391,116 +506,10 @@ public class ImageManipulationActivity extends Activity
         }
     }
 
-    public void calculateMatrix() {
-
-        float w = hud.getWidth();
-        float h = hud.getHeight();
-
-        Matrix matrix = new Matrix();
-
-        float tscale = scaleDelta * scale;
-        matrix.postTranslate(-hud.dimensions.right / 2.0f, -hud.dimensions.bottom / 2.0f);
-        matrix.postRotate(rotationDelta + rotation);
-        matrix.postScale(tscale, tscale);
-
-        matrix.postTranslate(w / 2.0f, h / 2.0f);
-        matrix.postTranslate(offset.x + offsetDelta.x, offset.y + offsetDelta.y);
-
-        hud.setMatrix(matrix);
-
-        hud.invalidate();
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         //super.onTouchEvent(event);
         return gestures.onTouchEvent(event);
-    }
-
-    @Override
-    public void onCancel(GestureDetection.Pan pan) {
-        offsetDelta.set(0,0);
-
-        calculateMatrix();
-    }
-
-    @Override
-    public void onBegin(GestureDetection.Pan pan) {
-        offsetDelta.set(0, 0);
-    }
-
-    @Override
-    public void onMove(GestureDetection.Pan pan) {
-        PointF delta = pan.getDelta();
-        offsetDelta.x = delta.x;
-        offsetDelta.y = delta.y;
-
-        calculateMatrix();
-    }
-
-    @Override
-    public void onEnd(GestureDetection.Pan pan) {
-        PointF delta = pan.getDelta();
-        offset.x += delta.x;
-        offset.y += delta.y;
-
-        offsetDelta.set(0,0);
-
-        calculateMatrix();
-    }
-
-    @Override
-    public void onCancel(GestureDetection.Pinch pinch) {
-        scaleDelta = 1.0f;
-
-        calculateMatrix();
-    }
-
-    @Override
-    public void onBegin(GestureDetection.Pinch pinch) {
-        scaleDelta = 1.0f;
-    }
-
-    @Override
-    public void onMove(GestureDetection.Pinch pinch) {
-        scaleDelta = pinch.getDelta();
-
-        calculateMatrix();
-    }
-
-    @Override
-    public void onEnd(GestureDetection.Pinch pinch) {
-        scale *= pinch.getDelta();
-        scaleDelta = 1.0f;
-
-        calculateMatrix();
-    }
-
-    @Override
-    public void onCancel(GestureDetection.Rotate rotate) {
-        rotationDelta = 0.0f;
-
-        calculateMatrix();
-    }
-
-    @Override
-    public void onBegin(GestureDetection.Rotate rotate) {
-        rotationDelta = 0.0f;
-    }
-
-    @Override
-    public void onMove(GestureDetection.Rotate rotate) {
-        rotationDelta = rotate.getDelta();
-
-        calculateMatrix();
-    }
-
-    @Override
-    public void onEnd(GestureDetection.Rotate rotate) {
-        rotation += rotate.getDelta();
-        rotationDelta = 0.0f;
-
-        calculateMatrix();
     }
 
     public void setUri( Uri newUri ) {
@@ -516,13 +525,7 @@ public class ImageManipulationActivity extends Activity
             return;
         }
 
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            setUri(intent.getData());
-
-            return;
-        }
-
-        if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
+        if ( (requestCode == REQUEST_IMAGE_CAPTURE || requestCode == REQUEST_GALLERY) && resultCode == RESULT_OK) {
             // Gallery app (samsung S4)
             // Photos app (samsung S4)
             // Dropbox app (samsung S4)

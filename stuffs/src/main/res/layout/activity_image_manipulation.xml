@@ -50,25 +50,25 @@
             android:orientation="horizontal"
             android:background="#80FFFFFF">
 
-            <Button
-                android:layout_width="100dp"
+            <ToggleButton
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/crop"
-                android:onClick="crop"
-                style="@style/Base.Widget.AppCompat.Button.Small"/>
+                android:checked="true"
+                android:text="@string/frame_lock"
+                android:textOn="@string/frame_locked"
+                android:textOff="@string/frame_unlocked"
+                android:onClick="frameLock"
+                android:id="@+id/framelock" />
+
+            <Space
+                android:layout_width="15dp"
+                android:layout_height="match_parent" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/brightness"
                 android:onClick="brightness"
-                style="@style/Base.Widget.AppCompat.Button.Small"/>
-
-            <Button
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:text="@string/resize"
-                android:onClick="resize"
                 style="@style/Base.Widget.AppCompat.Button.Small"/>
 
             <Space
