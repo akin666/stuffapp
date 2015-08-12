@@ -77,4 +77,7 @@
     <string name="title_activity_image_manipulation">ImageManipulationActivity</string>
     <string name="brightness">brightness</string>
     <string name="resize">Resize</string>
+    <string name="frame_lock">Frame lock</string>
+    <string name="frame_locked">Frame Locked</string>
+    <string name="frame_unlocked">Frame Unlocked</string>
 </resources>
